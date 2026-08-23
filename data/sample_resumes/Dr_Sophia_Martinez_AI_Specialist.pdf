@@ -1,0 +1,76 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1314 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Dr. Sophia Martinez - AI & Machine Learning Specialist) Tj
+/F1 10 Tf
+0 -20 Td
+0 -14 Td
+(New York, NY | sophia.martinez@ai-research.org | \(212\) 555-0198) Tj
+0 -14 Td
+(LinkedIn: linkedin.com/in/dr-sophia-martinez | GitHub: github.com/smartinez-ai) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(SUMMARY:) Tj
+0 -14 Td
+(Senior AI/ML Research Engineer with 5+ years specializing in NLP, LLMs, and RAG architectures.) Tj
+0 -14 Td
+(Published papers at NeurIPS on transformer efficiency and semantic embeddings.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(EXPERIENCE:) Tj
+0 -14 Td
+(Lead ML Engineer | DeepCognition Labs | 2022 - Present) Tj
+0 -14 Td
+(- Designed and deployed end-to-end RAG pipelines using LangChain, Pinecone, and Gemini/OpenAI.) Tj
+0 -14 Td
+(- Developed scalable FastAPI microservices to serve LLM inference containerized with Docker.) Tj
+0 -14 Td
+(- Fine-tuned Llama and Mistral models using PyTorch and Hugging Face Transformers.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(EDUCATION:) Tj
+0 -14 Td
+(Ph.D. in Computer Science \(Artificial Intelligence\) | Stanford University | 2016 - 2020) Tj
+0 -14 Td
+(Master of Science in Data Science | Columbia University | 2014 - 2016) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(SKILLS:) Tj
+0 -14 Td
+(Python, PyTorch, Large Language Models, NLP, LangChain, RAG, Vector Databases, FastAPI, Docker) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001607 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1677
+%%EOF

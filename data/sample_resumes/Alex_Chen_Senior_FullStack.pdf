@@ -1,0 +1,82 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1479 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Alex Chen - Senior Full Stack Engineer) Tj
+/F1 10 Tf
+0 -20 Td
+0 -14 Td
+(San Francisco, CA | alex.chen@techmail.io | \(415\) 892-3491) Tj
+0 -14 Td
+(LinkedIn: linkedin.com/in/alexchen-dev | GitHub: github.com/alexchen-dev) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(PROFESSIONAL SUMMARY:) Tj
+0 -14 Td
+(Senior Full Stack Engineer with 7+ years of experience designing and scaling) Tj
+0 -14 Td
+(distributed web applications. Expert in React, TypeScript, Node.js, AWS, and PostgreSQL.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(WORK EXPERIENCE:) Tj
+0 -14 Td
+(Staff / Senior Full Stack Engineer | CloudFlow Tech | 2021 - Present) Tj
+0 -14 Td
+(- Architected enterprise SaaS dashboard using React, TypeScript, Next.js, and Tailwind CSS.) Tj
+0 -14 Td
+(- Built resilient microservices with Node.js, Express, PostgreSQL, Redis, and Kafka.) Tj
+0 -14 Td
+(- Containerized workflows using Docker and managed cloud deployments on AWS \(ECS, RDS, S3\).) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(Full Stack Software Engineer | Horizon Fintech | 2018 - 2021) Tj
+0 -14 Td
+(- Developed real-time trading dashboards in React, Redux, and WebSockets.) Tj
+0 -14 Td
+(- Implemented secure RESTful and GraphQL APIs with Node.js and PostgreSQL.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(EDUCATION:) Tj
+0 -14 Td
+(Bachelor of Science in Computer Science | UC Berkeley | 2014 - 2018) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(TECHNICAL SKILLS:) Tj
+0 -14 Td
+(React, TypeScript, Node.js, Next.js, PostgreSQL, AWS, Docker, GraphQL, Redis, System Design) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001772 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1842
+%%EOF

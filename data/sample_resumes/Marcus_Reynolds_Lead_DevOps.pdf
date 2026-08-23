@@ -1,0 +1,70 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 980 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Marcus Reynolds - Lead Cloud & DevOps Engineer) Tj
+/F1 10 Tf
+0 -20 Td
+0 -14 Td
+(Austin, TX | marcus.reynolds@cloudops.net | \(512\) 441-9982) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(SUMMARY:) Tj
+0 -14 Td
+(Lead Cloud & DevOps Engineer with 8+ years of expertise in AWS, Kubernetes, Terraform, and CI/CD.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(EXPERIENCE:) Tj
+0 -14 Td
+(Staff DevOps Engineer | ScaleForge Systems | 2020 - Present) Tj
+0 -14 Td
+(- Architected enterprise Kubernetes \(EKS\) clusters hosting 120+ microservices on AWS.) Tj
+0 -14 Td
+(- Automated infrastructure provisioning using Terraform and built CI/CD with GitHub Actions.) Tj
+0 -14 Td
+(- Configured Prometheus and Grafana for full observability.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(EDUCATION:) Tj
+0 -14 Td
+(Bachelor of Science in Software Engineering | UT Austin | 2013 - 2017) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(SKILLS:) Tj
+0 -14 Td
+(AWS, Kubernetes, Terraform, Docker, CI/CD, Linux, Prometheus, Grafana, Python, Golang) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001272 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1342
+%%EOF
