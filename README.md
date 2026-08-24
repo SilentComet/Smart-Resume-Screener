@@ -1,10 +1,11 @@
 # Smart Resume Screener
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-indigo.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-v20%2B-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://react.dev/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite3-skyblue.svg)](https://www.sqlite.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8.svg)](https://tailwindcss.com/)
+[![Design System](https://img.shields.io/badge/Design%20System-Neo--Brutalism-black.svg)](https://github.com/SilentComet/Smart-Resume-Screener)
 
 > **Smart Resume Screener** is a production-grade, AI-powered Talent Intelligence & ATS Screening Platform. It intelligently parses multi-format resumes (PDF, DOCX, TXT), extracts structured candidate data (skills, timeline, education, contact info), and executes semantic matching and multi-dimensional scoring (1–10 scale) against job descriptions using LLMs with recruiter-grade justification.
 
@@ -19,25 +20,28 @@
 6. [API Reference](#-api-reference)
 7. [Installation & Quick Start](#-installation--quick-start)
 8. [Sample Datasets & Evaluation Flow](#-sample-datasets--evaluation-flow)
-9. [UI/UX Design System (UI/UX Pro Max)](#-uiux-design-system-uiux-pro-max)
+9. [Neo-Brutalist Design System](#-neo-brutalist-design-system)
+10. [License](#-license)
 
 ---
 
 ## 🌟 Key Features
 
-- **Multi-Format Resume Parser**: Ingests raw `.pdf`, `.txt`, and `.docx` resumes using `pdf-parse` and heuristic entity extractors.
+- **Multi-Format Resume Parser**: Ingests raw `.pdf`, `.txt`, and `.docx` resumes using `pdf-parse` and entity extractors.
 - **Structured Data Extraction**:
   - Full contact info (Name, Email, Phone, Location, LinkedIn, GitHub).
   - Categorized skill mapping across **8 domains & 300+ technologies** (Languages, Frontend, Backend, AI/ML, Cloud/DevOps, Databases, Architecture, Soft Skills).
   - Multi-role work history timeline, total experience calculation, and education credential matching.
 - **Semantic LLM Matching Engine (1–10 Fit Scale)**:
-  - Supports **Google Gemini 1.5 Flash**, **OpenAI GPT-4o-mini**, **Groq LLaMA 3.3 70B**, and **Built-in Local Semantic Engine** (zero API keys needed).
+  - Supports **Google Gemini** (dynamic flash discovery), **OpenAI GPT-4o**, **Groq** (dynamic high-throughput model discovery), and **Built-in Local Semantic Engine** (zero API keys required).
   - Multi-dimensional breakdown: Skill Fit %, Experience & Seniority Fit %, Education Match %.
-  - Verified matched skills (emerald tags) vs. missing requirement gaps (rose tags).
+  - Verified matched skills (green tags) vs. missing requirement gaps (pink tags).
   - Actionable Recruiter Justifications & Strengths / Risk flags analysis.
   - Recommended AI-tailored candidate interview questions.
 - **Recruiter Workflow & ATS Dashboard**:
   - **1-Click AI Batch Screening**: Rank and score all candidates against an active job opening in seconds.
+  - **Custom Neo-Brutalist Job Selector**: Interactive dropdown with department tags, experience levels, and direct management.
+  - **Profile Deletion**: Delete Job Positions and Candidate Profiles with cascade cleanup in SQLite.
   - **Status Management Pipeline**: `Shortlisted`, `Under Review`, `Interview Scheduled`, `Rejected` with celebration confetti.
   - **Side-by-Side Candidate Comparison Matrix**: Compare top candidates head-to-head.
   - **Dual View Modes**: Bento Grid Cards and High-Density ATS Table View.
@@ -60,10 +64,10 @@ In analyzing modern ATS platforms (*Ashby, Eightfold AI, Greenhouse, Resume-Matc
 
 ```mermaid
 graph TD
-    subgraph Client [Frontend - React + Tailwind CSS + Lucide]
+    subgraph Client [Frontend - React + Tailwind CSS + Lucide Icons]
         UI[Recruiter Dashboard]
         UploadUI[Multi-Resume Dropzone]
-        JobUI[Job Position Manager]
+        JobUI[Job Position Manager & Selector]
         CompareUI[Candidate Comparison Matrix]
         ModalUI[Candidate Deep-Dive Modal]
     end
@@ -76,9 +80,9 @@ graph TD
     end
 
     subgraph LLMEngine [Multi-Provider LLM Integration]
-        Gemini[Google Gemini 1.5 Flash]
+        Gemini[Google Gemini Flash API]
         OpenAI[OpenAI GPT-4o]
-        Groq[Groq LLaMA 3.3 70B]
+        Groq[Groq LLaMA / GPT-OSS]
         LocalEngine[Built-in Semantic Engine (Local AI)]
     end
 
@@ -237,8 +241,10 @@ CREATE TABLE screenings (
 | `POST` | `/api/resumes/parse-text` | Parse raw resume text directly |
 | `GET` | `/api/resumes` | Retrieve all parsed candidate profiles |
 | `GET` | `/api/resumes/:id` | Retrieve single candidate with full skill taxonomy |
+| `DELETE`| `/api/resumes/:id` | Permanently delete candidate profile & screening history |
 | `GET` | `/api/jobs` | Retrieve all active job openings |
 | `POST` | `/api/jobs` | Create a new job description with required skills tags |
+| `DELETE`| `/api/jobs/:id` | Delete job profile and associated candidate screenings |
 | `POST` | `/api/screen/match` | Evaluate a single candidate against a target job via LLM |
 | `POST` | `/api/screen/batch-screen` | 1-Click evaluate all candidates against target job |
 | `GET` | `/api/screen/job/:jobId` | Get all candidate rankings and justifications for a job |
@@ -246,6 +252,8 @@ CREATE TABLE screenings (
 | `GET` | `/api/stats?job_id=:id` | Aggregate metrics (Avg score, shortlisted count, top skill gaps) |
 | `GET` | `/api/export/csv?job_id=:id`| Export screening matrix to CSV |
 | `GET` | `/api/export/json?job_id=:id`| Export comprehensive JSON report |
+| `GET` | `/api/settings` | Retrieve active LLM configuration and keys |
+| `POST` | `/api/settings` | Save active LLM provider and API keys |
 | `POST` | `/api/settings/test` | Test connectivity with Gemini, OpenAI, or Groq |
 
 ---
@@ -258,8 +266,8 @@ CREATE TABLE screenings (
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone <repo-url>
-cd asgnmt
+git clone https://github.com/SilentComet/Smart-Resume-Screener.git
+cd Smart-Resume-Screener
 
 # Install root, server, and client packages
 npm install
@@ -268,7 +276,7 @@ npm --prefix client install
 ```
 
 ### 2. (Optional) Configure Environment Variables
-Create a `.env` file in `server/` (or configure via the UI Settings modal):
+Create a `.env` file in `server/` (or configure directly in the UI Settings modal):
 ```env
 PORT=5000
 # Optional external LLM API Keys (Built-in engine works out of the box without keys)
@@ -279,7 +287,7 @@ GROQ_API_KEY=your_groq_key_here
 
 ### 3. Build & Run Application
 ```bash
-# Start backend server & frontend client concurrently
+# Start backend server & frontend client
 npm start
 ```
 Open your browser and navigate to **`http://localhost:5000`** (or `http://localhost:5173` in Vite dev mode).
@@ -292,7 +300,7 @@ The application comes pre-seeded with 4 diverse Job Descriptions and 6 realistic
 
 1. **Alex Chen** *(Senior Full Stack Engineer - 7 Yrs Exp)*: React, TypeScript, Node.js, Next.js, AWS, Docker, PostgreSQL.
    - **Fit for Senior Full Stack**: **9.7 / 10 (Exceptional Match)**
-2. **Dr. Sophia Martinez** *(Ph.D. AI / ML Researcher - 5 Yrs Exp)*: Python, PyTorch, Transformers, LLMs, LangChain, RAG, FastAPIs.
+2. **Dr. Sophia Martinez** *(Ph.D. AI / ML Researcher - 5 Yrs Exp)*: Python, PyTorch, Transformers, LLMs, LangChain, RAG, FastAPI.
    - **Fit for AI/ML Specialist**: **9.8 / 10 (Exceptional Match)**
 3. **Marcus Reynolds** *(Lead DevOps Engineer - 8 Yrs Exp)*: Kubernetes, Terraform, AWS, Docker, CI/CD, Prometheus.
    - **Fit for Lead DevOps**: **9.6 / 10 (Exceptional Match)**
@@ -305,11 +313,16 @@ The application comes pre-seeded with 4 diverse Job Descriptions and 6 realistic
 
 ---
 
-## 🎨 UI/UX Design System (UI/UX Pro Max)
+## 🎨 Neo-Brutalist Design System
 
-- **Color Palette**: Dark Slate background (`#0B0F19`), Glassmorphism surface cards (`rgba(17, 24, 39, 0.75)`), Electric Indigo accents (`#6366F1`), Emerald for top fit (`#10B981`), Amber for review (`#F59E0B`), and Rose for skill gaps (`#F43F5E`).
-- **Typography**: Clean hierarchy with `Plus Jakarta Sans` for headers and `JetBrains Mono` for tabular metrics and scores.
-- **Micro-Interactions**: Animated score radials, hover states, live progress indicators, interactive comparison matrix, and celebratory confetti upon shortlisting.
+- **Visual Aesthetic**: High-contrast Neo-Brutalism with bold black borders (`2.5px - 3px solid #0a0a0a`) and hard offset shadows (`3px 3px 0 #0a0a0a`, `4px 4px 0 #0a0a0a`, `5px 5px 0 #0a0a0a`).
+- **Curated Color Palette**:
+  - Warm Canvas: Cream `#fafaf5`
+  - Accent Primary: Cyber Yellow `#FFE500`
+  - Status Indicators: Emerald Green `#00CC44` (Shortlisted/High Fit), Electric Blue `#0066FF` (Interview/Strong Fit), Vivid Orange `#FF5500` (Review/Moderate Fit), Hot Pink `#FF0099` (Reject/Risk Gaps)
+  - Contrast Core: Deep Black `#0a0a0a`
+- **Typography**: Space Grotesk (headings and display) paired with IBM Plex Mono (metrics, score chips, badges, and technical tags).
+- **Micro-Interactions**: Neo-Brutalist custom dropdown menus, tactile button click translations, score badges, candidate comparison matrix, and celebratory confetti upon shortlisting.
 
 ---
 
