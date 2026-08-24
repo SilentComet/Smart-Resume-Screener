@@ -11,29 +11,37 @@
 
 ---
 
+## 📸 Application Preview
+
+![Smart Resume Screener Main Dashboard](screenshots/01_dashboard_overview.png)
+*Recruiter Dashboard: Real-time candidate scoring, bento metrics, active job profiles, and pipeline management in Neo-Brutalism design.*
+
+---
+
 ## 📑 Table of Contents
 1. [Key Features](#-key-features)
-2. [Market Research & Architecture Pattern](#-market-research--architecture-pattern)
-3. [System Architecture](#-system-architecture)
-4. [LLM Prompt Engineering & Scoring Strategy](#-llm-prompt-engineering--scoring-strategy)
-5. [Database Schema (SQLite)](#-database-schema-sqlite)
-6. [API Reference](#-api-reference)
-7. [Installation & Quick Start](#-installation--quick-start)
-8. [Sample Datasets & Evaluation Flow](#-sample-datasets--evaluation-flow)
-9. [Neo-Brutalist Design System](#-neo-brutalist-design-system)
-10. [License](#-license)
+2. [UI Walkthrough & Visual Previews](#-ui-walkthrough--visual-previews)
+3. [Market Research & Architecture Pattern](#-market-research--architecture-pattern)
+4. [System Architecture](#-system-architecture)
+5. [LLM Prompt Engineering & Scoring Strategy](#-llm-prompt-engineering--scoring-strategy)
+6. [Database Schema (SQLite)](#-database-schema-sqlite)
+7. [API Reference](#-api-reference)
+8. [Installation & Quick Start](#-installation--quick-start)
+9. [Sample Datasets & Evaluation Flow](#-sample-datasets--evaluation-flow)
+10. [Neo-Brutalist Design System](#-neo-brutalist-design-system)
+11. [License](#-license)
 
 ---
 
 ## 🌟 Key Features
 
-- **Multi-Format Resume Parser**: Ingests raw `.pdf`, `.txt`, and `.docx` resumes using `pdf-parse` and entity extractors.
+- **Multi-Format Resume Parser**: Ingests raw `.pdf`, `.txt`, and `.docx` resumes using `pdf-parse` and heuristic entity extractors.
 - **Structured Data Extraction**:
   - Full contact info (Name, Email, Phone, Location, LinkedIn, GitHub).
   - Categorized skill mapping across **8 domains & 300+ technologies** (Languages, Frontend, Backend, AI/ML, Cloud/DevOps, Databases, Architecture, Soft Skills).
   - Multi-role work history timeline, total experience calculation, and education credential matching.
 - **Semantic LLM Matching Engine (1–10 Fit Scale)**:
-  - Supports **Google Gemini** (dynamic flash discovery), **OpenAI GPT-4o**, **Groq** (dynamic high-throughput model discovery), and **Built-in Local Semantic Engine** (zero API keys required).
+  - Supports **Google Gemini** (dynamic model discovery), **OpenAI GPT-4o**, **Groq** (dynamic high-throughput model discovery), and **Built-in Local Semantic Engine** (zero API keys required).
   - Multi-dimensional breakdown: Skill Fit %, Experience & Seniority Fit %, Education Match %.
   - Verified matched skills (green tags) vs. missing requirement gaps (pink tags).
   - Actionable Recruiter Justifications & Strengths / Risk flags analysis.
@@ -46,6 +54,57 @@
   - **Side-by-Side Candidate Comparison Matrix**: Compare top candidates head-to-head.
   - **Dual View Modes**: Bento Grid Cards and High-Density ATS Table View.
   - **Export Center**: 1-click export of candidate screening results to CSV and JSON reports.
+
+---
+
+## 🖼️ UI Walkthrough & Visual Previews
+
+### 1. AI Recruiter Reasoning & Candidate Deep-Dive
+Clicking **Full Breakdown** on any candidate opens the detailed evaluation modal containing the 1–10 fit score, 4-tier sub-scores, verified skill chips, missing gaps, actionable recruiter reasoning, and interview questions.
+
+![Candidate AI Deep-Dive Modal](screenshots/03_candidate_ai_evaluation.png)
+
+---
+
+### 2. Side-by-Side Candidate Comparison Matrix
+Select multiple candidate checkboxes and open the comparison matrix to evaluate candidates head-to-head across fit scores, semantic match percentage, verified skills, and strengths.
+
+![Side-by-Side Candidate Comparison Matrix](screenshots/04_candidate_comparison_matrix.png)
+
+---
+
+### 3. Custom Neo-Brutalist Job Position Selector
+Switch target job profiles instantly using the custom Neo-Brutalist dropdown menu featuring department badges, experience benchmarks, active indicators, and deletion options.
+
+![Neo-Brutalist Job Selector Dropdown](screenshots/02_job_selector_dropdown.png)
+
+---
+
+### 4. High-Density ATS Table View
+Toggle from card grid to high-density table mode for bulk candidate screening, instant status transitions (`Shortlisted`, `Under Review`, `Interview Scheduled`, `Rejected`), and quick profile inspection.
+
+![High-Density Candidate Table View](screenshots/05_high_density_table_view.png)
+
+---
+
+### 5. Multi-Resume Upload & Text Ingestion
+Drag and drop batch PDF/DOCX/TXT resume files or paste raw plain text resumes for real-time parsing and skill extraction.
+
+![Multi-Resume Upload Modal](screenshots/07_multi_resume_upload.png)
+
+---
+
+### 6. Job Position Creation & Customization
+Define custom job titles, departments, required skills (weighted for 1–10 score), bonus skills, minimum experience thresholds, and role descriptions.
+
+![Create Job Position Modal](screenshots/06_create_job_modal.png)
+
+---
+
+### 7. Multi-Provider LLM Settings & Dynamic API Testing
+Switch seamlessly between **Google Gemini Flash**, **OpenAI GPT-4o**, **Groq LLaMA**, and the **Built-in Local Semantic Engine** with live connection testing.
+
+![LLM Settings & Connection Test](screenshots/08_llm_provider_settings.png)
 
 ---
 
