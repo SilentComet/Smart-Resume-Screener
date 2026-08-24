@@ -196,11 +196,40 @@ Evaluate the candidate thoroughly and return a valid JSON object ONLY (no markdo
 }
 
 /**
+ * Dynamically resolves an available, active model for Gemini API
+ */
+export async function resolveGeminiModel(apiKey) {
+  const preferred = [
+    'gemini-2.5-flash',
+    'gemini-3.5-flash',
+    'gemini-3.6-flash',
+    'gemini-flash-latest',
+    'gemini-2.5-pro'
+  ];
+
+  try {
+    const listRes = await axios.get(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`, { timeout: 6000 });
+    const modelNames = (listRes.data?.models || []).map(m => m.name.replace('models/', ''));
+    for (const p of preferred) {
+      if (modelNames.includes(p)) {
+        return p;
+      }
+    }
+    const flashModel = modelNames.find(n => n.includes('flash') && !n.includes('image') && !n.includes('tts') && !n.includes('audio'));
+    if (flashModel) return flashModel;
+  } catch (e) {
+    console.warn('Gemini model resolution error:', e.message);
+  }
+  return 'gemini-2.5-flash';
+}
+
+/**
  * Screen Candidate with Gemini API
  */
 async function screenWithGemini(candidate, job, apiKey) {
   const prompt = buildLLMPrompt(candidate, job);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const model = await resolveGeminiModel(apiKey);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const response = await axios.post(url, {
     contents: [{ parts: [{ text: prompt }] }],
@@ -213,7 +242,7 @@ async function screenWithGemini(candidate, job, apiKey) {
   const rawJson = response.data.candidates[0].content.parts[0].text;
   const cleanJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
   const parsed = JSON.parse(cleanJson);
-  parsed.screening_model = 'Google Gemini 1.5 Flash';
+  parsed.screening_model = `Google Gemini (${model})`;
   return parsed;
 }
 
@@ -241,12 +270,45 @@ async function screenWithOpenAI(candidate, job, apiKey) {
 }
 
 /**
+ * Dynamically resolves an available, active chat model on Groq for the given API key
+ */
+export async function resolveGroqModel(apiKey) {
+  const preferred = [
+    'openai/gpt-oss-120b',
+    'openai/gpt-oss-20b',
+    'groq/compound',
+    'llama-3.3-70b-versatile',
+    'llama-3.1-70b-versatile',
+    'llama-3.1-8b-instant'
+  ];
+
+  try {
+    const modelsRes = await axios.get('https://api.groq.com/openai/v1/models', {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      timeout: 8000
+    });
+    const ids = (modelsRes.data?.data || []).map(m => m.id);
+    for (const p of preferred) {
+      if (ids.includes(p)) {
+        return p;
+      }
+    }
+    const chatModel = ids.find(id => !id.includes('whisper') && !id.includes('guard'));
+    if (chatModel) return chatModel;
+  } catch (e) {
+    console.warn('Groq model resolution error:', e.message);
+  }
+  return 'groq/compound';
+}
+
+/**
  * Screen Candidate with Groq API
  */
 async function screenWithGroq(candidate, job, apiKey) {
   const prompt = buildLLMPrompt(candidate, job);
+  const model = await resolveGroqModel(apiKey);
   const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-    model: 'llama-3.3-70b-versatile',
+    model,
     messages: [
       { role: 'system', content: 'You are a precise technical hiring evaluator. Return valid JSON only.' },
       { role: 'user', content: prompt }
@@ -259,7 +321,7 @@ async function screenWithGroq(candidate, job, apiKey) {
   });
 
   const parsed = JSON.parse(response.data.choices[0].message.content);
-  parsed.screening_model = 'Groq LLaMA 3.3 70B';
+  parsed.screening_model = `Groq (${model})`;
   return parsed;
 }
 

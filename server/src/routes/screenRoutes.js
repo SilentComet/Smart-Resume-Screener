@@ -8,6 +8,18 @@ function generateScreeningId() {
   return 'scr_' + Math.random().toString(36).substring(2, 9);
 }
 
+async function getEffectiveSettings(customSettings) {
+  if (customSettings && Object.keys(customSettings).length > 0) {
+    return customSettings;
+  }
+  const rows = await query.all('SELECT * FROM settings');
+  const dbSettings = {};
+  rows.forEach(r => {
+    dbSettings[r.key] = r.value;
+  });
+  return dbSettings;
+}
+
 // Screen Candidate against a Job Description
 router.post('/match', async (req, res) => {
   try {
@@ -26,8 +38,9 @@ router.post('/match', async (req, res) => {
     candidate.experience = JSON.parse(candidate.experience || '[]');
     candidate.education = JSON.parse(candidate.education || '[]');
 
-    // Perform LLM Scoring
-    const evaluation = await screenCandidate(candidate, job, customSettings || {});
+    // Perform LLM Scoring using saved or custom settings
+    const effectiveSettings = await getEffectiveSettings(customSettings);
+    const evaluation = await screenCandidate(candidate, job, effectiveSettings);
 
     // Determine initial auto-status based on score
     const defaultStatus = evaluation.fit_score >= 8.0 ? 'Shortlisted' : (evaluation.fit_score >= 5.5 ? 'Under Review' : 'Rejected');
@@ -127,6 +140,7 @@ router.post('/batch-screen', async (req, res) => {
 
     const candidates = await query.all('SELECT * FROM candidates');
     const screenedResults = [];
+    const effectiveSettings = await getEffectiveSettings(customSettings);
 
     for (const rawCand of candidates) {
       const candidate = {
@@ -136,7 +150,7 @@ router.post('/batch-screen', async (req, res) => {
         education: JSON.parse(rawCand.education || '[]')
       };
 
-      const evaluation = await screenCandidate(candidate, job, customSettings || {});
+      const evaluation = await screenCandidate(candidate, job, effectiveSettings);
       const defaultStatus = evaluation.fit_score >= 8.0 ? 'Shortlisted' : (evaluation.fit_score >= 5.5 ? 'Under Review' : 'Rejected');
 
       const existing = await query.get('SELECT id, status FROM screenings WHERE candidate_id = ? AND job_id = ?', [candidate.id, job_id]);

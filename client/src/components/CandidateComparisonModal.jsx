@@ -1,5 +1,12 @@
 import React from 'react';
-import { X, CheckCircle2, XCircle, Award, Briefcase, ThumbsUp, AlertTriangle } from 'lucide-react';
+import { X, CheckCircle2, XCircle, ThumbsUp } from 'lucide-react';
+
+function getScoreStyle(score) {
+  if (score >= 8.5) return { bg: '#00CC44', color: '#0a0a0a' };
+  if (score >= 7.0) return { bg: '#0066FF', color: '#fff' };
+  if (score >= 5.0) return { bg: '#FF5500', color: '#fff' };
+  return { bg: '#FF0099', color: '#fff' };
+}
 
 export default function CandidateComparisonModal({
   candidates,
@@ -11,148 +18,135 @@ export default function CandidateComparisonModal({
   if (!candidates || candidates.length < 2) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-6xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden flex flex-col max-h-[92vh]">
-        
+    <div className="nb-overlay" style={{ alignItems: 'flex-start', paddingTop: 20 }}>
+      <div className="nb-card-static" style={{ width: '100%', maxWidth: 1100, maxHeight: '92vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
         {/* Header */}
-        <div className="p-6 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
+        <div style={{ background: '#0a0a0a', borderBottom: '2.5px solid #0a0a0a', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <span className="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Side-by-Side Matrix
-            </span>
-            <h2 className="text-2xl font-extrabold text-white mt-1">
-              Comparing {candidates.length} Candidates for {selectedJob?.title}
+            <span className="nb-badge nb-badge-yellow" style={{ marginBottom: 8, display: 'inline-flex' }}>Side-by-Side Matrix</span>
+            <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 22, color: '#fafaf5', margin: 0 }}>
+              Comparing {candidates.length} Candidates · {selectedJob?.title}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+            style={{ background: '#FFE500', border: '2.5px solid #FFE500', color: '#0a0a0a', padding: 10, cursor: 'pointer', boxShadow: '3px 3px 0 #FFE500', transition: 'all 0.1s' }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = '1px 1px 0 #FFE500'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #FFE500'; }}
           >
-            <X className="w-5 h-5" />
+            <X style={{ width: 18, height: 18 }} />
           </button>
         </div>
 
-        {/* Comparison Grid */}
-        <div className="p-6 overflow-x-auto overflow-y-auto">
-          <div className="grid grid-flow-col auto-cols-[340px] sm:auto-cols-[380px] gap-4 min-w-full">
+        {/* Comparison Columns */}
+        <div style={{ flex: 1, overflowX: 'auto', overflowY: 'auto', padding: 24, background: '#fafaf5' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${candidates.length}, minmax(300px, 1fr))`, gap: 16, minWidth: `${candidates.length * 316}px` }}>
             {candidates.map((c) => {
               const name = c.candidate_name || c.name;
               const fit = c.fit_score || 0;
               const matched = c.matched_skills || [];
               const missing = c.missing_skills || [];
               const strengths = c.strengths || [];
-              const weaknesses = c.weaknesses || [];
+              const scoreStyle = getScoreStyle(fit);
 
               return (
-                <div key={c.id || c.candidate_id} className="bg-slate-850 border border-slate-750 rounded-xl p-5 flex flex-col justify-between space-y-4">
-                  
-                  {/* Top Card Info */}
-                  <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h3 className="text-lg font-bold text-white">{name}</h3>
-                        <p className="text-xs text-slate-400 font-mono">{c.candidate_email || c.email}</p>
-                      </div>
-                      <span className="px-2.5 py-1 text-xs font-bold font-mono rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
-                        {fit} / 10
-                      </span>
-                    </div>
+                <div key={c.id || c.candidate_id} className="nb-card-static" style={{ display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden' }}>
 
-                    {/* Progress Bar */}
-                    <div className="mt-3">
-                      <div className="flex justify-between text-xs text-slate-400 mb-1">
-                        <span>Match Level</span>
-                        <span className="font-mono font-bold text-white">{c.match_percentage || 0}%</span>
+                  {/* Score banner */}
+                  <div style={{ background: scoreStyle.bg, borderBottom: '2.5px solid #0a0a0a', padding: '16px 18px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 17, color: scoreStyle.color, margin: 0 }}>{name}</h3>
+                      <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 22, color: scoreStyle.color }}>{fit}/10</span>
+                    </div>
+                    <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: scoreStyle.color, opacity: 0.75, margin: 0 }}>{c.candidate_email || c.email}</p>
+
+                    {/* Match bar */}
+                    <div style={{ marginTop: 10 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, fontWeight: 700, color: scoreStyle.color, marginBottom: 4 }}>
+                        <span>Semantic Match</span>
+                        <span>{c.match_percentage || 0}%</span>
                       </div>
-                      <div className="w-full bg-slate-800 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full"
-                          style={{ width: `${c.match_percentage || 0}%` }}
-                        />
+                      <div style={{ height: 8, background: 'rgba(0,0,0,0.2)', border: '1.5px solid rgba(0,0,0,0.3)' }}>
+                        <div style={{ height: '100%', width: `${c.match_percentage || 0}%`, background: '#0a0a0a', transition: 'width 0.5s' }} />
                       </div>
                     </div>
                   </div>
 
-                  {/* Experience & Education */}
-                  <div className="space-y-2 py-2 border-y border-slate-800 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Total Experience:</span>
-                      <span className="font-mono font-bold text-white">{c.total_years_experience || 2}+ Years</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Current Status:</span>
-                      <span className="font-semibold text-emerald-400">{c.status || 'Under Review'}</span>
-                    </div>
-                  </div>
+                  <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
 
-                  {/* Matched Skills */}
-                  <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1 mb-2">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Matched Skills ({matched.length})
-                    </h5>
-                    <div className="flex flex-wrap gap-1">
-                      {matched.map(s => (
-                        <span key={s} className="px-2 py-0.5 text-[11px] font-medium bg-emerald-500/15 text-emerald-200 border border-emerald-500/30 rounded">
-                          {s}
+                    {/* Meta */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, borderBottom: '2px solid #0a0a0a', paddingBottom: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#0a0a0a', opacity: 0.55 }}>Experience:</span>
+                        <span className="nb-badge nb-badge-black" style={{ fontSize: 10 }}>{c.total_years_experience || 2} yrs</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#0a0a0a', opacity: 0.55 }}>Status:</span>
+                        <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, fontWeight: 800, color: c.status === 'Shortlisted' ? '#00CC44' : '#0a0a0a' }}>
+                          {c.status || 'Under Review'}
                         </span>
-                      ))}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Missing Skills */}
-                  <div>
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1 mb-2">
-                      <XCircle className="w-3.5 h-3.5" /> Missing Requirements ({missing.length})
-                    </h5>
-                    <div className="flex flex-wrap gap-1">
-                      {missing.length > 0 ? (
-                        missing.map(s => (
-                          <span key={s} className="px-2 py-0.5 text-[11px] font-medium bg-rose-500/15 text-rose-200 border border-rose-500/30 rounded">
-                            {s}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-slate-500 italic">None (Full Coverage)</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Strengths */}
-                  {strengths.length > 0 && (
+                    {/* Matched Skills */}
                     <div>
-                      <h5 className="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1 mb-1.5">
-                        <ThumbsUp className="w-3.5 h-3.5" /> Key Strengths
+                      <h5 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 10, color: '#00CC44', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                        <CheckCircle2 style={{ width: 12, height: 12 }} /> Matched ({matched.length})
                       </h5>
-                      <ul className="text-xs text-slate-300 space-y-1">
-                        {strengths.slice(0, 2).map((st, i) => (
-                          <li key={i} className="line-clamp-2">• {st}</li>
-                        ))}
-                      </ul>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {matched.slice(0, 6).map(s => <span key={s} className="skill-chip-match" style={{ fontSize: 10 }}>{s}</span>)}
+                        {matched.length > 6 && <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: '#00CC44', fontWeight: 700 }}>+{matched.length - 6}</span>}
+                      </div>
                     </div>
-                  )}
 
-                  {/* Action Buttons */}
-                  <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => onStatusChange(c.id || c.candidate_id, 'Shortlisted')}
-                      className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition"
-                    >
-                      ★ Shortlist
-                    </button>
-                    <button
-                      onClick={() => onSelectCandidate(c)}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition"
-                    >
-                      Full Profile
-                    </button>
+                    {/* Missing Skills */}
+                    <div>
+                      <h5 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 10, color: '#FF0099', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                        <XCircle style={{ width: 12, height: 12 }} /> Gaps ({missing.length})
+                      </h5>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {missing.length > 0
+                          ? missing.slice(0, 4).map(s => <span key={s} className="skill-chip-miss" style={{ fontSize: 10 }}>{s}</span>)
+                          : <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: '#00CC44', fontWeight: 700 }}>Full Coverage!</span>
+                        }
+                      </div>
+                    </div>
+
+                    {/* Strengths */}
+                    {strengths.length > 0 && (
+                      <div>
+                        <h5 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 10, color: '#0066FF', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                          <ThumbsUp style={{ width: 12, height: 12 }} /> Strengths
+                        </h5>
+                        <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                          {strengths.slice(0, 2).map((st, i) => (
+                            <li key={i} style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 12, color: '#0a0a0a', lineHeight: 1.6 }}>→ {st}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                   </div>
 
+                  {/* Actions */}
+                  <div style={{ borderTop: '2.5px solid #0a0a0a', padding: '12px 16px', display: 'flex', gap: 8, background: '#fafaf5' }}>
+                    <button
+                      className="nb-btn nb-btn-green"
+                      onClick={() => onStatusChange(c.id || c.candidate_id, 'Shortlisted')}
+                      style={{ flex: 1, padding: '8px 12px', fontSize: 12, justifyContent: 'center' }}
+                    >★ Shortlist</button>
+                    <button
+                      className="nb-btn nb-btn-black"
+                      onClick={() => onSelectCandidate(c)}
+                      style={{ padding: '8px 14px', fontSize: 12 }}
+                    >Profile →</button>
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
-
       </div>
     </div>
   );

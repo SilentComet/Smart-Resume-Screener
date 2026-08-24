@@ -1,66 +1,50 @@
 import React, { useState } from 'react';
-import { X, Briefcase, Plus, Tag, Loader2, Sparkles } from 'lucide-react';
+import { X, Briefcase, Plus, Loader2, Zap } from 'lucide-react';
 import { createJob } from '../api/client.js';
+
+const LABEL_STYLE = {
+  fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, fontSize: 11,
+  textTransform: 'uppercase', letterSpacing: '0.06em', color: '#0a0a0a',
+  display: 'block', marginBottom: 6
+};
 
 export default function JobModal({ onClose, onSuccess }) {
   const [title, setTitle] = useState('');
   const [department, setDepartment] = useState('Engineering');
-  const [experienceLevel, setExperienceLevel] = useState('Senior Level');
+  const [experienceLevel, setExperienceLevel] = useState('Senior Level (5+ Yrs)');
   const [minYears, setMinYears] = useState(4);
   const [reqSkillInput, setReqSkillInput] = useState('');
   const [reqSkills, setReqSkills] = useState(['React', 'TypeScript', 'Node.js', 'PostgreSQL']);
   const [niceSkillInput, setNiceSkillInput] = useState('');
   const [niceSkills, setNiceSkills] = useState(['AWS', 'Docker', 'GraphQL']);
-  const [responsibilities, setResponsibilities] = useState('');
-  const [educationReq, setEducationReq] = useState("Bachelor's degree in Computer Science or related field");
+  const [educationReq, setEducationReq] = useState("Bachelor's in Computer Science or related");
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const addReqSkill = () => {
-    if (reqSkillInput.trim() && !reqSkills.includes(reqSkillInput.trim())) {
-      setReqSkills([...reqSkills, reqSkillInput.trim()]);
-      setReqSkillInput('');
+  const addSkill = (list, setList, input, setInput) => {
+    if (input.trim() && !list.includes(input.trim())) {
+      setList([...list, input.trim()]);
+      setInput('');
     }
   };
 
-  const removeReqSkill = (skill) => {
-    setReqSkills(reqSkills.filter(s => s !== skill));
-  };
-
-  const addNiceSkill = () => {
-    if (niceSkillInput.trim() && !niceSkills.includes(niceSkillInput.trim())) {
-      setNiceSkills([...niceSkills, niceSkillInput.trim()]);
-      setNiceSkillInput('');
-    }
-  };
-
-  const removeNiceSkill = (skill) => {
-    setNiceSkills(niceSkills.filter(s => s !== skill));
-  };
+  const removeSkill = (list, setList, skill) => setList(list.filter(s => s !== skill));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !description.trim()) {
-      setError('Job title and description are required');
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
+    if (!title.trim() || !description.trim()) { setError('Job title and description are required'); return; }
+    setIsLoading(true); setError(null);
     try {
       const created = await createJob({
-        title: title.trim(),
-        department,
+        title: title.trim(), department,
         experience_level: experienceLevel,
         min_years_experience: Number(minYears),
-        required_skills: reqSkills,
-        nice_to_have_skills: niceSkills,
-        responsibilities,
+        required_skills: reqSkills, nice_to_have_skills: niceSkills,
         education_requirement: educationReq,
         description: description.trim()
       });
-      onSuccess(created);
-      onClose();
+      onSuccess(created); onClose();
     } catch (err) {
       setError(err.message || 'Failed to create job');
     } finally {
@@ -68,205 +52,145 @@ export default function JobModal({ onClose, onSuccess }) {
     }
   };
 
+  // Validation: enable submit only when both required fields are non-empty
+  const canSubmit = title.trim().length > 0 && description.trim().length > 0;
+
+  const SkillTagInput = ({ label, accent, list, setList, input, setInput, placeholder }) => (
+    <div>
+      <label style={{ ...LABEL_STYLE, color: accent }}>{label}</label>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+        <input
+          type="text"
+          className="nb-input"
+          placeholder={placeholder}
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addSkill(list, setList, input, setInput); } }}
+          style={{ flex: 1, padding: '8px 12px', fontSize: 13, boxShadow: '2px 2px 0 #0a0a0a' }}
+        />
+        <button type="button" className="nb-btn nb-btn-black" onClick={() => addSkill(list, setList, input, setInput)} style={{ padding: '8px 14px', fontSize: 12 }}>
+          <Plus style={{ width: 14, height: 14 }} /> Add
+        </button>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, maxHeight: 88, overflowY: 'auto' }}>
+        {list.map(s => (
+          <span key={s} style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, fontSize: 11, border: `2px solid ${accent}`, padding: '3px 10px', display: 'flex', alignItems: 'center', gap: 6, background: accent === '#0066FF' ? '#e8f0fe' : '#f5fff0', color: '#0a0a0a' }}>
+            {s}
+            <button type="button" onClick={() => removeSkill(list, setList, s)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 800, color: '#0a0a0a', lineHeight: 1, padding: 0 }}>×</button>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-750 rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
-        
+    <div className="nb-overlay" style={{ alignItems: 'flex-start', paddingTop: 20, paddingBottom: 20 }}>
+      <div style={{
+        width: '100%', maxWidth: 680,
+        maxHeight: 'calc(100vh - 40px)',
+        display: 'flex', flexDirection: 'column',
+        background: '#fafaf5',
+        border: '2.5px solid #0a0a0a',
+        boxShadow: '6px 6px 0 #0a0a0a',
+        overflow: 'hidden',
+      }}>
+
         {/* Header */}
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-              <Briefcase className="w-5 h-5" />
+        <div style={{ background: '#0a0a0a', borderBottom: '2.5px solid #0a0a0a', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 40, height: 40, background: '#FFE500', border: '2px solid #FFE500', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Briefcase style={{ width: 22, height: 22, color: '#0a0a0a' }} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Create New Job Description</h2>
-              <p className="text-xs text-slate-400">Configure target role, skills, and scoring criteria</p>
+              <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 18, color: '#fafaf5', margin: 0 }}>Create Job Position</h2>
+              <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: '#fafaf5', opacity: 0.55, margin: '2px 0 0' }}>Configure role, skills & scoring criteria</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} style={{ background: '#FFE500', border: '2.5px solid #FFE500', color: '#0a0a0a', padding: 8, cursor: 'pointer' }}>
+            <X style={{ width: 18, height: 18 }} />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
-          
+        {/* Scrollable form body */}
+        <form onSubmit={handleSubmit} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: 24, display: 'flex', flexDirection: 'column', gap: 18, background: '#fafaf5', minHeight: 0 }}>
+
           {error && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300">
-              ⚠️ {error}
+            <div style={{ background: '#FF0099', border: '2.5px solid #0a0a0a', padding: '10px 14px', boxShadow: '3px 3px 0 #0a0a0a' }}>
+              <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, fontSize: 12, color: '#fff' }}>⚠ {error}</span>
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Row 1: Title + Department */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Job Title *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Lead Backend Engineer"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-750 text-slate-100 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              />
+              <label style={LABEL_STYLE}>Job Title *</label>
+              <input type="text" required className="nb-input" placeholder="e.g. Lead Backend Engineer" value={title} onChange={e => setTitle(e.target.value)} style={{ width: '100%', padding: '10px 14px', fontSize: 14, boxShadow: '3px 3px 0 #0a0a0a' }} />
             </div>
-
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Department</label>
-              <input
-                type="text"
-                placeholder="e.g. Infrastructure / Product"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-750 text-slate-100 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              />
+              <label style={LABEL_STYLE}>Department</label>
+              <input type="text" className="nb-input" placeholder="e.g. Engineering" value={department} onChange={e => setDepartment(e.target.value)} style={{ width: '100%', padding: '10px 14px', fontSize: 14, boxShadow: '3px 3px 0 #0a0a0a' }} />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Row 2: Level + Min Years */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Experience Level</label>
-              <select
-                value={experienceLevel}
-                onChange={(e) => setExperienceLevel(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-750 text-slate-100 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              >
-                <option value="Entry Level (0-2 Yrs)">Entry Level (0-2 Yrs)</option>
-                <option value="Mid Level (2-4 Yrs)">Mid Level (2-4 Yrs)</option>
-                <option value="Senior Level (5+ Yrs)">Senior Level (5+ Yrs)</option>
-                <option value="Lead / Staff Level (7+ Yrs)">Lead / Staff Level (7+ Yrs)</option>
+              <label style={LABEL_STYLE}>Experience Level</label>
+              <select className="nb-select" value={experienceLevel} onChange={e => setExperienceLevel(e.target.value)} style={{ width: '100%', padding: '10px 14px', fontSize: 13, boxShadow: '3px 3px 0 #0a0a0a' }}>
+                <option>Entry Level (0-2 Yrs)</option>
+                <option>Mid Level (2-4 Yrs)</option>
+                <option>Senior Level (5+ Yrs)</option>
+                <option>Lead / Staff Level (7+ Yrs)</option>
               </select>
             </div>
-
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Minimum Years of Experience</label>
-              <input
-                type="number"
-                min={0}
-                max={25}
-                value={minYears}
-                onChange={(e) => setMinYears(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-750 text-slate-100 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              />
+              <label style={LABEL_STYLE}>Min Years Exp</label>
+              <input type="number" min={0} max={25} className="nb-input" value={minYears} onChange={e => setMinYears(e.target.value)} style={{ width: '100%', padding: '10px 14px', fontSize: 14, boxShadow: '3px 3px 0 #0a0a0a' }} />
             </div>
           </div>
 
-          {/* Required Skills Tag Input */}
-          <div>
-            <label className="block text-xs font-semibold text-indigo-300 mb-1">
-              Required Skills (Crucial for 1-10 match score)
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                placeholder="Type skill & press Add (e.g. Python, Docker)"
-                value={reqSkillInput}
-                onChange={(e) => setReqSkillInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addReqSkill(); } }}
-                className="flex-1 px-3 py-1.5 bg-slate-950 border border-slate-750 text-slate-100 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              />
-              <button
-                type="button"
-                onClick={addReqSkill}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1"
-              >
-                <Plus className="w-3.5 h-3.5" /> Add
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
-              {reqSkills.map(s => (
-                <span
-                  key={s}
-                  className="px-2.5 py-1 text-xs font-medium bg-indigo-500/20 text-indigo-200 border border-indigo-500/30 rounded-lg flex items-center gap-1.5"
-                >
-                  {s}
-                  <button type="button" onClick={() => removeReqSkill(s)} className="text-indigo-400 hover:text-white">
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
+          {/* Required Skills */}
+          <SkillTagInput
+            label="Required Skills (Critical for 1-10 score)"
+            accent="#0066FF"
+            list={reqSkills} setList={setReqSkills}
+            input={reqSkillInput} setInput={setReqSkillInput}
+            placeholder="Type skill + Enter (e.g. Python, Docker)"
+          />
 
           {/* Nice to Have Skills */}
+          <SkillTagInput
+            label="Nice-to-Have Skills (Bonus points)"
+            accent="#00CC44"
+            list={niceSkills} setList={setNiceSkills}
+            input={niceSkillInput} setInput={setNiceSkillInput}
+            placeholder="e.g. Kubernetes, Redis, AWS"
+          />
+
+          {/* Education */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Nice-to-Have Skills (Bonus points)
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                placeholder="e.g. Kubernetes, Redis, AWS"
-                value={niceSkillInput}
-                onChange={(e) => setNiceSkillInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addNiceSkill(); } }}
-                className="flex-1 px-3 py-1.5 bg-slate-950 border border-slate-750 text-slate-100 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              />
-              <button
-                type="button"
-                onClick={addNiceSkill}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-1"
-              >
-                <Plus className="w-3.5 h-3.5" /> Add
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {niceSkills.map(s => (
-                <span
-                  key={s}
-                  className="px-2.5 py-1 text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 rounded-lg flex items-center gap-1.5"
-                >
-                  {s}
-                  <button type="button" onClick={() => removeNiceSkill(s)} className="text-slate-400 hover:text-white">
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
+            <label style={LABEL_STYLE}>Education Requirement</label>
+            <input type="text" className="nb-input" value={educationReq} onChange={e => setEducationReq(e.target.value)} style={{ width: '100%', padding: '10px 14px', fontSize: 13, boxShadow: '3px 3px 0 #0a0a0a' }} />
           </div>
 
-          {/* Job Description */}
+          {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Job Description & Context *</label>
-            <textarea
-              rows={4}
-              required
-              placeholder="Detail the position scope, daily responsibilities, and team expectations..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-750 text-slate-100 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"
-            />
+            <label style={LABEL_STYLE}>Job Description & Context *</label>
+            <textarea rows={4} required className="nb-input" placeholder="Detail the position scope, daily responsibilities, team expectations..." value={description} onChange={e => setDescription(e.target.value)} style={{ width: '100%', padding: '10px 14px', fontSize: 13, resize: 'vertical', boxShadow: '3px 3px 0 #0a0a0a' }} />
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl flex items-center gap-2 transition"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Creating Position...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Create & Activate Job
-                </>
-              )}
+          </div>{/* end scrollable area */}
+
+          {/* Sticky action footer — always visible outside scroll */}
+          <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '14px 24px', borderTop: '2.5px solid #0a0a0a', background: '#fafaf5' }}>
+            <button type="button" className="nb-btn nb-btn-white" onClick={onClose} style={{ padding: '10px 20px', fontSize: 13 }}>Cancel</button>
+            <button type="submit" disabled={isLoading || !canSubmit} className="nb-btn nb-btn-primary" style={{ padding: '10px 20px', fontSize: 13 }}>
+              {isLoading ? <Loader2 style={{ width: 15, height: 15, animation: 'nb-spin 0.8s linear infinite' }} /> : <Zap style={{ width: 15, height: 15 }} />}
+              {isLoading ? 'Creating...' : 'Create & Activate Job'}
             </button>
           </div>
-
         </form>
-
       </div>
     </div>
   );

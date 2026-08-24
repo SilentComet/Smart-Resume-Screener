@@ -1,6 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import { query } from '../db/database.js';
+import { resolveGroqModel, resolveGeminiModel } from '../services/llmService.js';
 
 const router = express.Router();
 
@@ -61,16 +62,19 @@ router.post('/test', async (req, res) => {
     if (provider === 'gemini') {
       const key = apiKey || process.env.GEMINI_API_KEY;
       if (!key) return res.status(400).json({ error: 'Gemini API key is required' });
-      const testRes = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+      
+      const model = await resolveGeminiModel(key);
+      await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
         contents: [{ parts: [{ text: 'Ping' }] }]
       }, { timeout: 10000 });
-      return res.json({ success: true, message: 'Google Gemini API connected successfully!' });
+
+      return res.json({ success: true, message: `Google Gemini API connected successfully using model ${model}!` });
     }
 
     if (provider === 'openai') {
       const key = apiKey || process.env.OPENAI_API_KEY;
       if (!key) return res.status(400).json({ error: 'OpenAI API key is required' });
-      const testRes = await axios.post('https://api.openai.com/v1/chat/completions', {
+      await axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-4o-mini',
         messages: [{ role: 'user', content: 'Ping' }],
         max_tokens: 5
@@ -84,15 +88,16 @@ router.post('/test', async (req, res) => {
     if (provider === 'groq') {
       const key = apiKey || process.env.GROQ_API_KEY;
       if (!key) return res.status(400).json({ error: 'Groq API key is required' });
-      const testRes = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-        model: 'llama-3.3-70b-versatile',
+      const model = await resolveGroqModel(key);
+      await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+        model,
         messages: [{ role: 'user', content: 'Ping' }],
         max_tokens: 5
       }, {
         headers: { Authorization: `Bearer ${key}` },
         timeout: 10000
       });
-      return res.json({ success: true, message: 'Groq API connected successfully!' });
+      return res.json({ success: true, message: `Groq API connected successfully using model ${model}!` });
     }
 
     return res.json({ success: true, message: 'Built-in Local Semantic Engine is active and running.' });

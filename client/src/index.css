@@ -1,78 +1,367 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* =============================================
+   NEO-BRUTALIST DESIGN SYSTEM — TalentPulse AI
+   ============================================= */
+
 :root {
-  color-scheme: dark;
+  --black: #0a0a0a;
+  --white: #fafaf5;
+  --cream: #f5f0e8;
+  --yellow: #FFE500;
+  --yellow-dark: #e6ce00;
+  --blue: #0066FF;
+  --blue-light: #3d8bff;
+  --pink: #FF0099;
+  --orange: #FF5500;
+  --lime: #00CC44;
+  --border: 2.5px solid #0a0a0a;
+  --shadow: 4px 4px 0px #0a0a0a;
+  --shadow-lg: 6px 6px 0px #0a0a0a;
+  --shadow-xl: 8px 8px 0px #0a0a0a;
+  --shadow-hover: 2px 2px 0px #0a0a0a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: var(--cream);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #0B0F19;
+  background-color: var(--cream);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.5) 0px, transparent 100%);
-  background-attachment: fixed;
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(0,0,0,0.04) 39px,
+      rgba(0,0,0,0.04) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(0,0,0,0.04) 39px,
+      rgba(0,0,0,0.04) 40px
+    );
 }
 
-/* Custom Glassmorphism Card Style */
-.glass-panel {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--cream); border-left: 1px solid #0a0a0a; }
+::-webkit-scrollbar-thumb { background: var(--black); border: 1px solid var(--cream); }
+::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+
+/* ── Typography ── */
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+/* ── Brutalist Base Components ── */
+.nb-card {
+  background: var(--white);
+  border: var(--border);
+  box-shadow: var(--shadow-lg);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-.glass-panel-hover {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.glass-panel-hover:hover {
-  background: rgba(24, 33, 53, 0.85);
-  border-color: rgba(99, 102, 241, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 36px 0 rgba(99, 102, 241, 0.15);
+.nb-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translate(4px, 4px);
 }
 
-/* Radial Gauge / Score Badge */
-.score-radial {
-  background: conic-gradient(
-    var(--score-color, #6366f1) calc(var(--score-pct, 0) * 1%),
-    rgba(255, 255, 255, 0.08) 0
-  );
+.nb-card-static {
+  background: var(--white);
+  border: var(--border);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(11, 15, 25, 0.6);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
+.nb-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  border: var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: box-shadow 0.1s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
 }
 
-/* Pulse Glows */
-.glow-indigo {
-  box-shadow: 0 0 25px rgba(99, 102, 241, 0.25);
+.nb-btn:hover:not(:disabled) {
+  box-shadow: var(--shadow-hover);
+  transform: translate(2px, 2px);
 }
 
-.glow-emerald {
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+.nb-btn:active:not(:disabled) {
+  box-shadow: none;
+  transform: translate(4px, 4px);
 }
 
-.glow-rose {
-  box-shadow: 0 0 25px rgba(244, 63, 94, 0.25);
+.nb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.glow-amber {
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+.nb-btn-primary {
+  background: var(--yellow);
+  color: var(--black);
+}
+
+.nb-btn-primary:hover:not(:disabled) {
+  background: var(--yellow-dark);
+}
+
+.nb-btn-blue {
+  background: var(--blue);
+  color: #fff;
+}
+
+.nb-btn-blue:hover:not(:disabled) {
+  background: var(--blue-light);
+}
+
+.nb-btn-black {
+  background: var(--black);
+  color: var(--white);
+}
+
+.nb-btn-black:hover:not(:disabled) {
+  background: #1a1a1a;
+}
+
+.nb-btn-white {
+  background: var(--white);
+  color: var(--black);
+}
+
+.nb-btn-green {
+  background: var(--lime);
+  color: var(--black);
+}
+
+.nb-btn-pink {
+  background: var(--pink);
+  color: #fff;
+}
+
+.nb-btn-orange {
+  background: var(--orange);
+  color: #fff;
+}
+
+.nb-input {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  border: var(--border);
+  background: var(--white);
+  color: var(--black);
+  outline: none;
+  transition: box-shadow 0.1s ease;
+}
+
+.nb-input:focus {
+  box-shadow: 3px 3px 0px var(--blue);
+}
+
+.nb-select {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  border: var(--border);
+  background: var(--white);
+  color: var(--black);
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.1s ease;
+}
+
+.nb-select:focus {
+  box-shadow: 3px 3px 0px var(--blue);
+}
+
+/* ── Badge/Pill System ── */
+.nb-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid var(--black);
+  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nb-badge-yellow { background: var(--yellow); color: var(--black); }
+.nb-badge-blue { background: var(--blue); color: #fff; }
+.nb-badge-green { background: var(--lime); color: var(--black); }
+.nb-badge-pink { background: var(--pink); color: #fff; }
+.nb-badge-orange { background: var(--orange); color: #fff; }
+.nb-badge-black { background: var(--black); color: var(--white); }
+.nb-badge-white { background: var(--white); color: var(--black); }
+.nb-badge-cream { background: var(--cream); color: var(--black); }
+
+/* ── Score Colors ── */
+.score-exceptional { color: var(--lime); }
+.score-strong { color: var(--blue); }
+.score-moderate { color: var(--orange); }
+.score-low { color: var(--pink); }
+
+.score-bg-exceptional { background: var(--lime); color: var(--black); }
+.score-bg-strong { background: var(--blue); color: #fff; }
+.score-bg-moderate { background: var(--orange); color: #fff; }
+.score-bg-low { background: var(--pink); color: #fff; }
+
+/* ── Status Colors ── */
+.status-shortlisted { background: var(--lime); color: var(--black); }
+.status-interview { background: var(--blue); color: #fff; }
+.status-rejected { background: var(--pink); color: #fff; }
+.status-review { background: var(--yellow); color: var(--black); }
+.status-unscreened { background: var(--cream); color: var(--black); border: 2px solid var(--black); }
+
+/* ── Section Dividers ── */
+.nb-divider {
+  height: 3px;
+  background: var(--black);
+  width: 100%;
+}
+
+/* ── Animations ── */
+@keyframes nb-slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nb-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes nb-pulse-border {
+  0%, 100% { border-color: var(--black); }
+  50% { border-color: var(--yellow); }
+}
+
+.nb-animate-in { animation: nb-slide-in 0.2s ease forwards; }
+.nb-spin { animation: nb-spin 0.8s linear infinite; }
+.nb-pulse { animation: nb-pulse-border 1.5s ease-in-out infinite; }
+
+/* ── Modal Overlay ── */
+.nb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* ── Tag/Skill Chips ── */
+.skill-chip-match {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1.5px solid var(--black);
+  padding: 2px 8px;
+  background: var(--lime);
+  color: var(--black);
+}
+
+.skill-chip-miss {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1.5px solid var(--black);
+  padding: 2px 8px;
+  background: var(--pink);
+  color: #fff;
+}
+
+.skill-chip-required {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1.5px solid var(--black);
+  padding: 2px 8px;
+  background: var(--blue);
+  color: #fff;
+}
+
+.skill-chip-bonus {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1.5px solid var(--black);
+  padding: 2px 8px;
+  background: var(--white);
+  color: var(--black);
+}
+
+/* ── Progress Bar ── */
+.nb-progress {
+  height: 12px;
+  background: var(--white);
+  border: 2px solid var(--black);
+  overflow: hidden;
+}
+
+.nb-progress-fill {
+  height: 100%;
+  background: var(--yellow);
+  transition: width 0.5s ease;
+}
+
+.nb-progress-fill-blue { background: var(--blue); }
+.nb-progress-fill-green { background: var(--lime); }
+.nb-progress-fill-orange { background: var(--orange); }
+.nb-progress-fill-pink { background: var(--pink); }
+
+/* ── Checkbox ── */
+input[type="checkbox"].nb-check {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid var(--black);
+  border-radius: 0;
+  background: var(--white);
+  cursor: pointer;
+  accent-color: var(--yellow);
+  outline: none;
+}
+
+/* ── Range input ── */
+input[type="range"] {
+  accent-color: var(--black);
+}
+
+/* ── Toast ── */
+.nb-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  background: var(--black);
+  color: var(--yellow);
+  border: 3px solid var(--yellow);
+  box-shadow: 5px 5px 0px var(--yellow);
+  padding: 12px 20px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  max-width: 380px;
+  animation: nb-slide-in 0.2s ease;
 }

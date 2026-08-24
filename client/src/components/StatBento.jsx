@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, UserCheck, Award, AlertTriangle, TrendingUp, Sparkles } from 'lucide-react';
+import { Users, UserCheck, Award, AlertTriangle } from 'lucide-react';
 
 export default function StatBento({ stats, selectedJob }) {
   const {
@@ -13,90 +13,106 @@ export default function StatBento({ stats, selectedJob }) {
 
   const shortlistRatio = totalScreened > 0 ? Math.round((shortlistedCount / totalScreened) * 100) : 0;
 
+  const cards = [
+    {
+      label: 'Total Applicants',
+      value: totalCandidates,
+      unit: null,
+      sub: `${totalScreened} screened · ${totalCandidates - totalScreened} pending`,
+      icon: <Users style={{ width: 24, height: 24 }} />,
+      accent: '#0066FF',
+      textColor: '#fff',
+    },
+    {
+      label: 'Shortlisted',
+      value: shortlistedCount,
+      unit: null,
+      sub: `${shortlistRatio}% of screened pool`,
+      icon: <UserCheck style={{ width: 24, height: 24 }} />,
+      accent: '#00CC44',
+      textColor: '#0a0a0a',
+    },
+    {
+      label: 'Avg Fit Score',
+      value: avgFitScore,
+      unit: '/ 10',
+      sub: `${avgMatchPct}% avg semantic match`,
+      icon: <Award style={{ width: 24, height: 24 }} />,
+      accent: '#FFE500',
+      textColor: '#0a0a0a',
+      hasBar: true,
+      barPct: Math.min(100, Math.max(0, avgMatchPct)),
+    },
+    {
+      label: 'Top Skill Gaps',
+      value: null,
+      sub: null,
+      icon: <AlertTriangle style={{ width: 24, height: 24 }} />,
+      accent: '#FF0099',
+      textColor: '#fff',
+      isGaps: true,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      
-      {/* 1. Total Candidates */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-slate-700">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Applicants</p>
-            <h3 className="text-3xl font-extrabold text-white mt-1 font-mono">{totalCandidates}</h3>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-            <Users className="w-6 h-6" />
-          </div>
-        </div>
-        <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
-          <span className="text-emerald-400 font-medium font-mono">{totalScreened} Screened</span>
-          <span>•</span>
-          <span>{totalCandidates - totalScreened} Unscreened</span>
-        </div>
-      </div>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
+      {cards.map((card, i) => (
+        <div
+          key={i}
+          className="nb-card-static"
+          style={{ padding: 20, position: 'relative', overflow: 'hidden' }}
+        >
+          {/* Accent strip */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: card.accent }} />
 
-      {/* 2. Shortlisted Candidates */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Shortlisted</p>
-            <h3 className="text-3xl font-extrabold text-emerald-300 mt-1 font-mono">{shortlistedCount}</h3>
-          </div>
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <UserCheck className="w-6 h-6" />
-          </div>
-        </div>
-        <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
-          <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono font-medium">
-            {shortlistRatio}% of pool
-          </span>
-          <span className="text-slate-400">Top Tier Fit</span>
-        </div>
-      </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 6 }}>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0a0a0a', opacity: 0.6, margin: 0 }}>
+                {card.label}
+              </p>
 
-      {/* 3. Average Fit Score */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-indigo-500/30">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Avg Candidate Fit</p>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-3xl font-extrabold text-indigo-300 font-mono">{avgFitScore}</span>
-              <span className="text-slate-500 font-medium text-sm">/ 10</span>
+              {card.isGaps ? (
+                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {topMissingSkills.length > 0 ? (
+                    topMissingSkills.slice(0, 3).map(({ skill, count }) => (
+                      <span key={skill} className="nb-badge nb-badge-pink">
+                        {skill} ({count})
+                      </span>
+                    ))
+                  ) : (
+                    <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#0a0a0a', opacity: 0.5 }}>No major gaps</span>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 4 }}>
+                    <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 36, color: '#0a0a0a', lineHeight: 1 }}>
+                      {card.value}
+                    </span>
+                    {card.unit && (
+                      <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 14, fontWeight: 600, color: '#0a0a0a', opacity: 0.5 }}>{card.unit}</span>
+                    )}
+                  </div>
+
+                  {card.hasBar && (
+                    <div className="nb-progress" style={{ marginTop: 8, marginBottom: 4 }}>
+                      <div className="nb-progress-fill" style={{ width: `${card.barPct}%`, background: '#0066FF' }} />
+                    </div>
+                  )}
+
+                  <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: '#0a0a0a', opacity: 0.55, margin: '6px 0 0' }}>
+                    {card.sub}
+                  </p>
+                </>
+              )}
+            </div>
+
+            <div style={{ width: 44, height: 44, background: card.accent, border: '2px solid #0a0a0a', boxShadow: '3px 3px 0 #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: card.textColor, flexShrink: 0 }}>
+              {card.icon}
             </div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-            <Award className="w-6 h-6" />
-          </div>
         </div>
-        <div className="mt-3 w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-          <div
-            className="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(100, Math.max(0, avgMatchPct))}%` }}
-          />
-        </div>
-      </div>
-
-      {/* 4. Top Skill Gaps */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-rose-500/30">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-semibold uppercase tracking-wider text-rose-400">Top Skill Gaps</p>
-          <AlertTriangle className="w-4 h-4 text-rose-400" />
-        </div>
-        <div className="flex flex-wrap gap-1.5 mt-1">
-          {topMissingSkills.length > 0 ? (
-            topMissingSkills.slice(0, 3).map(({ skill, count }) => (
-              <span
-                key={skill}
-                className="px-2 py-0.5 text-[11px] font-medium bg-rose-500/10 text-rose-300 border border-rose-500/20 rounded-md"
-              >
-                {skill} <span className="opacity-60">({count})</span>
-              </span>
-            ))
-          ) : (
-            <span className="text-xs text-slate-500 italic">No significant gaps detected</span>
-          )}
-        </div>
-      </div>
-
+      ))}
     </div>
   );
 }

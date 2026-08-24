@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Sparkles, LayoutGrid, Table, Search, Filter, SlidersHorizontal, 
-  UserCheck, RefreshCw, AlertCircle, Plus, FileUp, Download 
-} from 'lucide-react';
+import { Zap, LayoutGrid, Table, Search, UserCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 import Navbar from './components/Navbar.jsx';
@@ -16,10 +13,10 @@ import UploadModal from './components/UploadModal.jsx';
 import JobModal from './components/JobModal.jsx';
 import SettingsModal from './components/SettingsModal.jsx';
 
-import { 
-  fetchJobs, fetchCandidates, fetchScreeningsForJob, 
-  batchScreenCandidates, screenSingleCandidate, updateCandidateStatus, 
-  fetchStats, fetchSettings 
+import {
+  fetchJobs, fetchCandidates, fetchScreeningsForJob,
+  batchScreenCandidates, screenSingleCandidate, updateCandidateStatus,
+  fetchStats, fetchSettings
 } from './api/client.js';
 
 export default function App() {
@@ -30,15 +27,13 @@ export default function App() {
   const [stats, setStats] = useState({});
   const [activeProvider, setActiveProvider] = useState('fallback');
 
-  // UI View & Filter State
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
-  const [statusFilter, setStatusFilter] = useState('All'); // 'All' | 'Shortlisted' | 'Under Review' | 'Interview Scheduled' | 'Rejected'
+  const [viewMode, setViewMode] = useState('grid');
+  const [statusFilter, setStatusFilter] = useState('All');
   const [minScoreFilter, setMinScoreFilter] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState('fit_score');
   const [sortOrder, setSortOrder] = useState('desc');
 
-  // Modals & Selection
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [selectedForCompare, setSelectedForCompare] = useState([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
@@ -48,62 +43,34 @@ export default function App() {
   const [isScreening, setIsScreening] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Show Toast
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
-  };
+  const showToast = (msg) => { setToastMessage(msg); setTimeout(() => setToastMessage(null), 3500); };
 
-  // Initial Load
   const loadInitialData = async () => {
     try {
-      const [jobsData, candidatesData, settingsData] = await Promise.all([
-        fetchJobs(),
-        fetchCandidates(),
-        fetchSettings()
-      ]);
-
+      const [jobsData, candidatesData, settingsData] = await Promise.all([fetchJobs(), fetchCandidates(), fetchSettings()]);
       setJobs(jobsData);
       setCandidates(candidatesData);
-      if (settingsData?.activeProvider) {
-        setActiveProvider(settingsData.activeProvider);
-      }
-
+      if (settingsData?.activeProvider) setActiveProvider(settingsData.activeProvider);
       if (jobsData.length > 0) {
         const defaultJob = selectedJob ? jobsData.find(j => j.id === selectedJob.id) || jobsData[0] : jobsData[0];
         setSelectedJob(defaultJob);
         await loadJobData(defaultJob.id);
       }
-    } catch (err) {
-      console.error('Initial data load error:', err);
-    }
+    } catch (err) { console.error('Initial data load error:', err); }
   };
 
   const loadJobData = async (jobId) => {
     try {
-      const [screeningsData, statsData] = await Promise.all([
-        fetchScreeningsForJob(jobId),
-        fetchStats(jobId)
-      ]);
+      const [screeningsData, statsData] = await Promise.all([fetchScreeningsForJob(jobId), fetchStats(jobId)]);
       setScreenings(screeningsData);
       setStats(statsData);
-    } catch (err) {
-      console.error('Job data load error:', err);
-    }
+    } catch (err) { console.error('Job data load error:', err); }
   };
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
+  useEffect(() => { loadInitialData(); }, []);
 
-  // When selected job changes
-  const handleSelectJob = async (job) => {
-    setSelectedJob(job);
-    setSelectedForCompare([]);
-    await loadJobData(job.id);
-  };
+  const handleSelectJob = async (job) => { setSelectedJob(job); setSelectedForCompare([]); await loadJobData(job.id); };
 
-  // 1-Click AI Batch Screening
   const handleBatchScreen = async (jobId) => {
     setIsScreening(true);
     try {
@@ -111,14 +78,10 @@ export default function App() {
       showToast(`🎯 ${res.message}`);
       await loadJobData(jobId);
       confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
-    } catch (err) {
-      showToast(`❌ Screening error: ${err.message}`);
-    } finally {
-      setIsScreening(false);
-    }
+    } catch (err) { showToast(`❌ Screening error: ${err.message}`); }
+    finally { setIsScreening(false); }
   };
 
-  // Single Candidate Screen
   const handleScreenSingle = async (candidate) => {
     if (!selectedJob) return;
     setIsScreening(true);
@@ -127,20 +90,13 @@ export default function App() {
       const res = await screenSingleCandidate(candId, selectedJob.id);
       showToast(`Evaluated ${candidate.name || candidate.candidate_name}: Fit Score ${res.fit_score}/10`);
       await loadJobData(selectedJob.id);
-      if (selectedCandidate && (selectedCandidate.id === candId || selectedCandidate.candidate_id === candId)) {
-        setSelectedCandidate(res);
-      }
-    } catch (err) {
-      showToast(`❌ Error: ${err.message}`);
-    } finally {
-      setIsScreening(false);
-    }
+      if (selectedCandidate && (selectedCandidate.id === candId || selectedCandidate.candidate_id === candId)) setSelectedCandidate(res);
+    } catch (err) { showToast(`❌ Error: ${err.message}`); }
+    finally { setIsScreening(false); }
   };
 
-  // Status Change
   const handleStatusChange = async (candidateIdOrScreeningId, newStatus) => {
     try {
-      // Look up screening record
       const screening = screenings.find(s => s.id === candidateIdOrScreeningId || s.candidate_id === candidateIdOrScreeningId);
       if (screening) {
         await updateCandidateStatus(screening.id, newStatus);
@@ -148,78 +104,42 @@ export default function App() {
         if (selectedCandidate && (selectedCandidate.id === screening.id || selectedCandidate.candidate_id === screening.candidate_id)) {
           setSelectedCandidate(prev => ({ ...prev, status: newStatus }));
         }
-        showToast(`Updated status to "${newStatus}"`);
+        showToast(`Status → "${newStatus}"`);
         const statsData = await fetchStats(selectedJob?.id);
         setStats(statsData);
       }
-    } catch (err) {
-      showToast(`❌ Status update failed: ${err.message}`);
-    }
+    } catch (err) { showToast(`❌ Status update failed: ${err.message}`); }
   };
 
-  // Comparison toggle
   const handleToggleCompare = (candidate) => {
     const candId = candidate.id || candidate.candidate_id;
     const exists = selectedForCompare.some(c => (c.id || c.candidate_id) === candId);
     if (exists) {
       setSelectedForCompare(prev => prev.filter(c => (c.id || c.candidate_id) !== candId));
     } else {
-      if (selectedForCompare.length >= 4) {
-        showToast('You can compare a maximum of 4 candidates at once.');
-        return;
-      }
+      if (selectedForCompare.length >= 4) { showToast('Max 4 candidates for comparison.'); return; }
       setSelectedForCompare(prev => [...prev, candidate]);
     }
   };
 
-  // Merge candidate pool with screenings for active job
   const combinedCandidates = candidates.map(cand => {
     const screening = screenings.find(s => s.candidate_id === cand.id);
     if (screening) {
-      return {
-        ...screening,
-        name: cand.name,
-        email: cand.email,
-        phone: cand.phone,
-        location: cand.location,
-        total_years_experience: cand.total_years_experience,
-        skills: cand.skills,
-        skills_by_category: cand.skills_by_category,
-        experience: cand.experience,
-        education: cand.education,
-        raw_text: cand.raw_text
-      };
+      return { ...screening, name: cand.name, email: cand.email, phone: cand.phone, location: cand.location, total_years_experience: cand.total_years_experience, skills: cand.skills, skills_by_category: cand.skills_by_category, experience: cand.experience, education: cand.education, raw_text: cand.raw_text };
     }
-    return {
-      ...cand,
-      candidate_id: cand.id,
-      candidate_name: cand.name,
-      candidate_email: cand.email,
-      candidate_location: cand.location,
-      status: 'Unscreened',
-      fit_score: null,
-      match_percentage: 0,
-      matched_skills: [],
-      missing_skills: []
-    };
+    return { ...cand, candidate_id: cand.id, candidate_name: cand.name, candidate_email: cand.email, candidate_location: cand.location, status: 'Unscreened', fit_score: null, match_percentage: 0, matched_skills: [], missing_skills: [] };
   });
 
-  // Filter & Search Candidates
   const filteredCandidates = combinedCandidates.filter(c => {
-    // Status Filter
     if (statusFilter !== 'All') {
       if (statusFilter === 'Shortlisted' && c.status !== 'Shortlisted') return false;
       if (statusFilter === 'Under Review' && c.status !== 'Under Review') return false;
       if (statusFilter === 'Interview Scheduled' && c.status !== 'Interview Scheduled') return false;
       if (statusFilter === 'Rejected' && c.status !== 'Rejected') return false;
     }
-
-    // Min Score Filter
     if (minScoreFilter > 0) {
       if (c.fit_score === null || c.fit_score < minScoreFilter) return false;
     }
-
-    // Search Query (Candidate Name or Skills)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const nameMatch = (c.candidate_name || c.name || '').toLowerCase().includes(q);
@@ -227,188 +147,152 @@ export default function App() {
       const textMatch = (c.raw_text || '').toLowerCase().includes(q);
       if (!nameMatch && !skillMatch && !textMatch) return false;
     }
-
     return true;
   });
 
-  // Sort
   const sortedCandidates = [...filteredCandidates].sort((a, b) => {
-    let valA = a[sortField];
-    let valB = b[sortField];
-
-    if (sortField === 'fit_score') {
-      valA = a.fit_score !== null ? a.fit_score : -1;
-      valB = b.fit_score !== null ? b.fit_score : -1;
-    } else if (sortField === 'experience') {
-      valA = a.total_years_experience || 0;
-      valB = b.total_years_experience || 0;
-    } else if (sortField === 'name') {
-      valA = (a.candidate_name || a.name || '').toLowerCase();
-      valB = (b.candidate_name || b.name || '').toLowerCase();
-    }
-
+    let valA = a[sortField], valB = b[sortField];
+    if (sortField === 'fit_score') { valA = a.fit_score !== null ? a.fit_score : -1; valB = b.fit_score !== null ? b.fit_score : -1; }
+    else if (sortField === 'experience') { valA = a.total_years_experience || 0; valB = b.total_years_experience || 0; }
+    else if (sortField === 'name') { valA = (a.candidate_name || a.name || '').toLowerCase(); valB = (b.candidate_name || b.name || '').toLowerCase(); }
     if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
     if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
 
   const handleSort = (field) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
+    if (sortField === field) setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    else { setSortField(field); setSortOrder('desc'); }
   };
 
+  const STATUS_FILTERS = ['All', 'Shortlisted', 'Under Review', 'Interview Scheduled', 'Rejected'];
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0F19] text-slate-100 selection:bg-indigo-500 selection:text-white">
-      
-      {/* Navigation Header */}
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--cream)' }}>
+
       <Navbar
-        jobs={jobs}
-        selectedJob={selectedJob}
-        onSelectJob={handleSelectJob}
-        onOpenUpload={() => setIsUploadOpen(true)}
-        onOpenNewJob={() => setIsJobModalOpen(true)}
+        jobs={jobs} selectedJob={selectedJob} onSelectJob={handleSelectJob}
+        onOpenUpload={() => setIsUploadOpen(true)} onOpenNewJob={() => setIsJobModalOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
-        candidateCount={candidates.length}
-        activeProvider={activeProvider}
+        candidateCount={candidates.length} activeProvider={activeProvider}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        {/* Toast Alert */}
+      <main style={{ flex: 1, maxWidth: 1280, width: '100%', margin: '0 auto', padding: '24px 24px 48px' }}>
+
+        {/* Toast */}
         {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 p-4 bg-slate-900 border border-indigo-500/50 rounded-2xl shadow-2xl text-xs font-semibold text-indigo-200 flex items-center gap-2 animate-in slide-in-from-bottom duration-200">
-            <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
+          <div className="nb-toast">
+            <Zap style={{ width: 16, height: 16, display: 'inline', marginRight: 8 }} />
             {toastMessage}
           </div>
         )}
 
-        {/* Top Analytics Bento */}
         <StatBento stats={stats} selectedJob={selectedJob} />
-
-        {/* Active Job Profile Banner & Screening CTA */}
-        <ActiveJobCard
-          job={selectedJob}
-          onBatchScreen={handleBatchScreen}
-          isScreening={isScreening}
-          selectedForCompare={selectedForCompare}
-          onOpenCompare={() => setIsCompareOpen(true)}
-        />
+        <ActiveJobCard job={selectedJob} onBatchScreen={handleBatchScreen} isScreening={isScreening} selectedForCompare={selectedForCompare} onOpenCompare={() => setIsCompareOpen(true)} />
 
         {/* Search, Filter & View Controls */}
-        <div className="glass-panel rounded-2xl p-4 mb-6 border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          
-          {/* Left: Search input */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search by candidate name, skill, or keyword..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-750 text-xs rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-            />
-          </div>
+        <div className="nb-card-static" style={{ padding: 16, marginBottom: 20 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
 
-          {/* Center: Status Tabs */}
-          <div className="flex flex-wrap items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80">
-            {['All', 'Shortlisted', 'Under Review', 'Interview Scheduled', 'Rejected'].map(st => (
-              <button
-                key={st}
-                onClick={() => setStatusFilter(st)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
-                  statusFilter === st
-                    ? 'bg-indigo-600 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {st === 'Shortlisted' ? '★ ' + st : st}
-              </button>
-            ))}
-          </div>
-
-          {/* Right: Min Score slider & View Switcher */}
-          <div className="flex items-center gap-4">
-            
-            {/* Min Score filter */}
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span>Min Fit:</span>
+            {/* Search */}
+            <div style={{ position: 'relative', flex: 1, minWidth: 200, maxWidth: 360 }}>
+              <Search style={{ width: 14, height: 14, position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#0a0a0a', opacity: 0.4 }} />
               <input
-                type="range"
-                min="0"
-                max="9"
-                step="0.5"
-                value={minScoreFilter}
-                onChange={(e) => setMinScoreFilter(parseFloat(e.target.value))}
-                className="w-20 accent-indigo-500 cursor-pointer"
+                type="text"
+                className="nb-input"
+                placeholder="Search by name, skill, keyword..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{ width: '100%', paddingLeft: 32, paddingRight: 12, paddingTop: 9, paddingBottom: 9, fontSize: 13, boxShadow: '2px 2px 0 #0a0a0a' }}
               />
-              <span className="font-mono font-bold text-indigo-300 w-8">{minScoreFilter}+</span>
             </div>
 
-            {/* View switcher */}
-            <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition ${viewMode === 'grid' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-300'}`}
-                title="Bento Grid View"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`p-1.5 rounded-lg transition ${viewMode === 'table' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-300'}`}
-                title="Dense ATS Table View"
-              >
-                <Table className="w-4 h-4" />
-              </button>
+            {/* Status Filters */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+              {STATUS_FILTERS.map(st => (
+                <button
+                  key={st}
+                  onClick={() => setStatusFilter(st)}
+                  style={{
+                    fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 10, textTransform: 'uppercase',
+                    letterSpacing: '0.05em', padding: '5px 12px',
+                    background: statusFilter === st ? '#0a0a0a' : '#fff',
+                    color: statusFilter === st ? '#FFE500' : '#0a0a0a',
+                    border: '2px solid #0a0a0a',
+                    boxShadow: statusFilter === st ? '2px 2px 0 #FFE500' : '2px 2px 0 #0a0a0a',
+                    cursor: 'pointer', transition: 'all 0.1s'
+                  }}
+                >
+                  {st === 'Shortlisted' ? '★ ' + st : st}
+                </button>
+              ))}
             </div>
 
+            {/* Right Controls */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {/* Min Score */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, fontWeight: 700, color: '#0a0a0a', opacity: 0.6, whiteSpace: 'nowrap' }}>Min Fit:</span>
+                <input type="range" min="0" max="9" step="0.5" value={minScoreFilter} onChange={e => setMinScoreFilter(parseFloat(e.target.value))} style={{ width: 80, accentColor: '#0a0a0a', cursor: 'pointer' }} />
+                <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 13, color: '#0a0a0a', background: '#FFE500', border: '2px solid #0a0a0a', padding: '2px 8px', minWidth: 36, textAlign: 'center' }}>{minScoreFilter}+</span>
+              </div>
+
+              {/* View Toggle */}
+              <div style={{ display: 'flex', border: '2.5px solid #0a0a0a', overflow: 'hidden', boxShadow: '3px 3px 0 #0a0a0a' }}>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  style={{ padding: '7px 12px', background: viewMode === 'grid' ? '#0a0a0a' : '#fff', color: viewMode === 'grid' ? '#FFE500' : '#0a0a0a', border: 'none', cursor: 'pointer', borderRight: '2px solid #0a0a0a' }}
+                  title="Grid View"
+                >
+                  <LayoutGrid style={{ width: 15, height: 15 }} />
+                </button>
+                <button
+                  onClick={() => setViewMode('table')}
+                  style={{ padding: '7px 12px', background: viewMode === 'table' ? '#0a0a0a' : '#fff', color: viewMode === 'table' ? '#FFE500' : '#0a0a0a', border: 'none', cursor: 'pointer' }}
+                  title="Table View"
+                >
+                  <Table style={{ width: 15, height: 15 }} />
+                </button>
+              </div>
+            </div>
           </div>
-
         </div>
 
-        {/* Candidate Pool Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <span>Candidates</span>
-            <span className="px-2 py-0.5 text-xs bg-indigo-500/20 text-indigo-300 rounded-full font-mono font-normal border border-indigo-500/30">
-              {sortedCandidates.length} matches
+        {/* Candidates Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 20, color: '#0a0a0a', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+            Candidates
+            <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 12, background: '#0a0a0a', color: '#FFE500', border: '2px solid #0a0a0a', padding: '2px 10px', boxShadow: '2px 2px 0 #FFE500' }}>
+              {sortedCandidates.length} results
             </span>
           </h3>
 
-          <div className="text-xs text-slate-400 flex items-center gap-2">
-            <span>Sort by:</span>
-            <button
-              onClick={() => handleSort('fit_score')}
-              className={`font-semibold transition ${sortField === 'fit_score' ? 'text-indigo-400 underline' : 'hover:text-slate-200'}`}
-            >
-              Fit Score
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => handleSort('experience')}
-              className={`font-semibold transition ${sortField === 'experience' ? 'text-indigo-400 underline' : 'hover:text-slate-200'}`}
-            >
-              Experience
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => handleSort('name')}
-              className={`font-semibold transition ${sortField === 'name' ? 'text-indigo-400 underline' : 'hover:text-slate-200'}`}
-            >
-              Name
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#0a0a0a', opacity: 0.5 }}>Sort by:</span>
+            {['fit_score', 'experience', 'name'].map(field => (
+              <button
+                key={field}
+                onClick={() => handleSort(field)}
+                style={{
+                  fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, fontSize: 11, textTransform: 'uppercase',
+                  background: sortField === field ? '#FFE500' : '#fff',
+                  color: '#0a0a0a', border: '2px solid #0a0a0a',
+                  boxShadow: sortField === field ? '2px 2px 0 #0a0a0a' : '2px 2px 0 #0a0a0a',
+                  padding: '4px 10px', cursor: 'pointer', transition: 'all 0.1s',
+                  opacity: sortField === field ? 1 : 0.6
+                }}
+              >
+                {field === 'fit_score' ? 'Score' : field === 'experience' ? 'Exp' : 'Name'}
+                {sortField === field && (sortOrder === 'asc' ? ' ↑' : ' ↓')}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Candidate List / Grid */}
+        {/* Candidate List */}
         {sortedCandidates.length > 0 ? (
           viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
               {sortedCandidates.map(candidate => (
                 <CandidateCard
                   key={candidate.id || candidate.candidate_id}
@@ -435,19 +319,18 @@ export default function App() {
             />
           )
         ) : (
-          <div className="glass-panel rounded-2xl p-12 text-center border-dashed border-slate-800 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto">
-              <UserCheck className="w-6 h-6" />
+          <div className="nb-card-static" style={{ padding: 48, textAlign: 'center' }}>
+            <div style={{ width: 60, height: 60, background: '#FFE500', border: '3px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '4px 4px 0 #0a0a0a' }}>
+              <UserCheck style={{ width: 30, height: 30, color: '#0a0a0a' }} />
             </div>
-            <h4 className="text-base font-bold text-white">No candidates match your current filter</h4>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              Try adjusting your min score slider, resetting status filters, or uploading more applicant resumes.
-            </p>
+            <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 18, color: '#0a0a0a', margin: '0 0 8px' }}>No candidates match your filter</h4>
+            <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, color: '#0a0a0a', opacity: 0.55, margin: '0 0 20px' }}>Try adjusting your score filter, resetting status, or uploading more resumes.</p>
             <button
+              className="nb-btn nb-btn-primary"
               onClick={() => { setStatusFilter('All'); setMinScoreFilter(0); setSearchQuery(''); }}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl text-indigo-300 transition inline-block"
+              style={{ padding: '10px 24px', fontSize: 13 }}
             >
-              Reset Filters
+              Reset All Filters
             </button>
           </div>
         )}
@@ -455,73 +338,36 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-6 mt-12 bg-slate-950/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>TalentPulse AI Smart Screener Engine • 100% Privacy Preserved (Local SQLite DB)</span>
+      <footer style={{ borderTop: '3px solid #0a0a0a', padding: '16px 24px', background: '#0a0a0a' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, background: '#00CC44', border: '1.5px solid #00CC44', display: 'inline-block' }} />
+            <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#fafaf5', opacity: 0.7 }}>
+              TalentPulse AI Smart Screener · Privacy Preserved · Local SQLite DB
+            </span>
           </div>
-          <div className="flex items-center gap-4">
-            <a href="/api/export/json" target="_blank" className="hover:text-slate-300 transition">JSON API Export</a>
-            <a href="/api/export/csv" download className="hover:text-slate-300 transition">CSV Download</a>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <a href="/api/export/json" target="_blank" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#FFE500', fontWeight: 700, textDecoration: 'none' }}>JSON API →</a>
+            <a href="/api/export/csv" download style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#FFE500', fontWeight: 700, textDecoration: 'none' }}>CSV Export →</a>
           </div>
         </div>
       </footer>
 
       {/* Modals */}
       {selectedCandidate && (
-        <CandidateDetailModal
-          candidate={selectedCandidate}
-          selectedJob={selectedJob}
-          onClose={() => setSelectedCandidate(null)}
-          onStatusChange={handleStatusChange}
-          onReScreen={handleScreenSingle}
-          isScreening={isScreening}
-        />
+        <CandidateDetailModal candidate={selectedCandidate} selectedJob={selectedJob} onClose={() => setSelectedCandidate(null)} onStatusChange={handleStatusChange} onReScreen={handleScreenSingle} isScreening={isScreening} />
       )}
-
       {isCompareOpen && (
-        <CandidateComparisonModal
-          candidates={selectedForCompare}
-          selectedJob={selectedJob}
-          onClose={() => setIsCompareOpen(false)}
-          onStatusChange={handleStatusChange}
-          onSelectCandidate={(c) => {
-            setIsCompareOpen(false);
-            setSelectedCandidate(c);
-          }}
-        />
+        <CandidateComparisonModal candidates={selectedForCompare} selectedJob={selectedJob} onClose={() => setIsCompareOpen(false)} onStatusChange={handleStatusChange} onSelectCandidate={c => { setIsCompareOpen(false); setSelectedCandidate(c); }} />
       )}
-
       {isUploadOpen && (
-        <UploadModal
-          onClose={() => setIsUploadOpen(false)}
-          onSuccess={() => {
-            loadInitialData();
-            showToast('New resumes uploaded and indexed successfully!');
-          }}
-        />
+        <UploadModal onClose={() => setIsUploadOpen(false)} onSuccess={() => { loadInitialData(); showToast('Resumes uploaded and indexed!'); }} />
       )}
-
       {isJobModalOpen && (
-        <JobModal
-          onClose={() => setIsJobModalOpen(false)}
-          onSuccess={(created) => {
-            loadInitialData();
-            setSelectedJob(created);
-            showToast(`Created job position: ${created.title}`);
-          }}
-        />
+        <JobModal onClose={() => setIsJobModalOpen(false)} onSuccess={created => { loadInitialData(); setSelectedJob(created); showToast(`Created: ${created.title}`); }} />
       )}
-
       {isSettingsOpen && (
-        <SettingsModal
-          onClose={() => setIsSettingsOpen(false)}
-          onProviderChanged={(p) => {
-            setActiveProvider(p);
-            showToast(`LLM Engine set to ${p}`);
-          }}
-        />
+        <SettingsModal onClose={() => setIsSettingsOpen(false)} onProviderChanged={p => { setActiveProvider(p); showToast(`LLM Engine: ${p}`); }} />
       )}
 
     </div>

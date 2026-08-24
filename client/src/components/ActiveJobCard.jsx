@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, Layers, Clock, GraduationCap, Play, Loader2, GitCompare, Sparkles } from 'lucide-react';
+import { Target, Clock, GraduationCap, Zap, Loader2, GitCompare } from 'lucide-react';
 
 export default function ActiveJobCard({
   job,
@@ -14,102 +14,90 @@ export default function ActiveJobCard({
   const niceSkills = Array.isArray(job.nice_to_have_skills) ? job.nice_to_have_skills : [];
 
   return (
-    <div className="glass-panel rounded-2xl p-6 mb-6 border-indigo-500/20 relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="nb-card-static" style={{ padding: 24, marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+      {/* Yellow top stripe */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: '#FFE500' }} />
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-        
-        {/* Left info */}
-        <div className="flex-1 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5">
-              <Target className="w-3.5 h-3.5" />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start', marginTop: 6 }}>
+
+        {/* Left: Job Info */}
+        <div style={{ flex: 1, minWidth: 280 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12, alignItems: 'center' }}>
+            <span className="nb-badge nb-badge-black">
+              <Target style={{ width: 10, height: 10 }} />
               Active Job Profile
             </span>
-            <span className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
-              {job.department}
+            <span className="nb-badge nb-badge-cream">{job.department}</span>
+            <span className="nb-badge nb-badge-cream" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Clock style={{ width: 10, height: 10 }} />
+              {job.min_years_experience || 3}+ yrs exp
             </span>
-            <span className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1">
-              <Clock className="w-3 h-3 text-slate-400" />
-              Min. {job.min_years_experience || 3}+ Years Exp
-            </span>
-            <span className="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-800 text-slate-300 border border-slate-700 flex items-center gap-1">
-              <GraduationCap className="w-3.5 h-3.5 text-slate-400" />
-              {job.education_requirement ? job.education_requirement.slice(0, 32) + '...' : 'Degree Required'}
+            <span className="nb-badge nb-badge-cream" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <GraduationCap style={{ width: 10, height: 10 }} />
+              {job.education_requirement ? job.education_requirement.slice(0, 28) : 'Degree Req.'}
             </span>
           </div>
 
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              {job.title}
-            </h2>
-            <p className="text-sm text-slate-300 mt-1 line-clamp-2 leading-relaxed">
-              {job.description}
-            </p>
-          </div>
+          <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 28, color: '#0a0a0a', margin: '0 0 8px', lineHeight: 1.1 }}>
+            {job.title}
+          </h2>
+          <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 14, color: '#0a0a0a', opacity: 0.65, margin: '0 0 16px', lineHeight: 1.5 }}>
+            {job.description}
+          </p>
 
-          {/* Required Skills & Nice to have */}
-          <div className="flex flex-wrap items-center gap-y-2 gap-x-4 pt-1">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-semibold text-indigo-300 mr-1">Required:</span>
-              {requiredSkills.map(skill => (
-                <span
-                  key={skill}
-                  className="px-2 py-0.5 text-xs font-medium bg-indigo-500/15 text-indigo-200 border border-indigo-500/30 rounded-md"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
+          {/* Skills */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-start' }}>
+            {requiredSkills.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, fontWeight: 700, color: '#0066FF', textTransform: 'uppercase' }}>Required:</span>
+                {requiredSkills.map(skill => (
+                  <span key={skill} className="skill-chip-required">{skill}</span>
+                ))}
+              </div>
+            )}
 
             {niceSkills.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-xs font-semibold text-slate-400 mr-1">Bonus:</span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, fontWeight: 700, color: '#0a0a0a', opacity: 0.5, textTransform: 'uppercase' }}>Bonus:</span>
                 {niceSkills.map(skill => (
-                  <span
-                    key={skill}
-                    className="px-2 py-0.5 text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700/60 rounded-md"
-                  >
-                    {skill}
-                  </span>
+                  <span key={skill} className="skill-chip-bonus">{skill}</span>
                 ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* Right Action Buttons */}
-        <div className="flex flex-row lg:flex-col items-center sm:items-end justify-between gap-3 shrink-0">
-          
+        {/* Right: Action Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 220 }}>
           <button
+            className="nb-btn nb-btn-primary"
             onClick={() => onBatchScreen(job.id)}
             disabled={isScreening}
-            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 active:scale-95 disabled:opacity-50 text-white font-semibold text-sm rounded-xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2.5 transition-all"
+            style={{ padding: '14px 22px', fontSize: 15, justifyContent: 'center', width: '100%' }}
           >
             {isScreening ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
-                <span>Screening All Candidates...</span>
+                <Loader2 style={{ width: 18, height: 18, animation: 'nb-spin 0.8s linear infinite' }} />
+                Screening All...
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-emerald-300" />
-                <span>1-Click AI Batch Screen</span>
+                <Zap style={{ width: 18, height: 18 }} />
+                1-Click AI Batch Screen
               </>
             )}
           </button>
 
           {selectedForCompare.length >= 2 && (
             <button
+              className="nb-btn nb-btn-blue"
               onClick={onOpenCompare}
-              className="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold rounded-xl flex items-center gap-2 transition animate-pulse"
+              style={{ padding: '10px 16px', fontSize: 13, justifyContent: 'center', width: '100%' }}
             >
-              <GitCompare className="w-4 h-4" />
+              <GitCompare style={{ width: 16, height: 16 }} />
               Compare Selected ({selectedForCompare.length})
             </button>
           )}
-
         </div>
 
       </div>
