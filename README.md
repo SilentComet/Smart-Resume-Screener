@@ -123,30 +123,30 @@ In analyzing modern ATS platforms (*Ashby, Eightfold AI, Greenhouse, Resume-Matc
 
 ```mermaid
 graph TD
-    subgraph Client [Frontend - React + Tailwind CSS + Lucide Icons]
-        UI[Recruiter Dashboard]
-        UploadUI[Multi-Resume Dropzone]
-        JobUI[Job Position Manager & Selector]
-        CompareUI[Candidate Comparison Matrix]
-        ModalUI[Candidate Deep-Dive Modal]
+    subgraph Client ["Frontend - React + Tailwind CSS + Lucide Icons"]
+        UI["Recruiter Dashboard"]
+        UploadUI["Multi-Resume Dropzone"]
+        JobUI["Job Position Manager & Selector"]
+        CompareUI["Candidate Comparison Matrix"]
+        ModalUI["Candidate Deep-Dive Modal"]
     end
 
-    subgraph Server [Backend - Express.js REST API]
-        Router[API Gateway / Router]
-        Parser[Parser & Entity Extractor (pdf-parse / regex)]
-        LLM[LLM Semantic Scoring Dispatcher]
-        DBService[SQLite Query Engine]
+    subgraph Server ["Backend - Express.js REST API"]
+        Router["API Gateway / Router"]
+        Parser["Parser & Entity Extractor (pdf-parse / regex)"]
+        LLM["LLM Semantic Scoring Dispatcher"]
+        DBService["SQLite Query Engine"]
     end
 
-    subgraph LLMEngine [Multi-Provider LLM Integration]
-        Gemini[Google Gemini Flash API]
-        OpenAI[OpenAI GPT-4o]
-        Groq[Groq LLaMA / GPT-OSS]
-        LocalEngine[Built-in Semantic Engine (Local AI)]
+    subgraph LLMEngine ["Multi-Provider LLM Integration"]
+        Gemini["Google Gemini Flash API"]
+        OpenAI["OpenAI GPT-4o"]
+        Groq["Groq LLaMA / GPT-OSS"]
+        LocalEngine["Built-in Semantic Engine (Local AI)"]
     end
 
-    subgraph Storage [Database]
-        SQLite[(screener.sqlite)]
+    subgraph Storage ["Database"]
+        SQLite[("screener.sqlite")]
     end
 
     UploadUI -->|PDF / Text Upload| Router
