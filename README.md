@@ -1,6 +1,7 @@
 # Smart Resume Screener
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Demo Video](https://img.shields.io/badge/YouTube-Demo%20Video-red?logo=youtube)](https://youtu.be/C8XE4IpxpRw)
 [![Node.js](https://img.shields.io/badge/Node.js-v20%2B-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://react.dev/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite3-skyblue.svg)](https://www.sqlite.org/)
@@ -8,6 +9,14 @@
 [![Design System](https://img.shields.io/badge/Design%20System-Neo--Brutalism-black.svg)](https://github.com/SilentComet/Smart-Resume-Screener)
 
 > **Smart Resume Screener** is a production-grade, AI-powered Talent Intelligence & ATS Screening Platform. It intelligently parses multi-format resumes (PDF, DOCX, TXT), extracts structured candidate data (skills, timeline, education, contact info), and executes semantic matching and multi-dimensional scoring (1–10 scale) against job descriptions using LLMs with recruiter-grade justification.
+
+---
+
+## 🎥 Live Demo Video
+
+[![Smart Resume Screener Video Walkthrough](https://img.youtube.com/vi/C8XE4IpxpRw/maxresdefault.jpg)](https://youtu.be/C8XE4IpxpRw)
+
+▶️ **Watch the complete walkthrough on YouTube**: [https://youtu.be/C8XE4IpxpRw](https://youtu.be/C8XE4IpxpRw)
 
 ---
 
@@ -19,17 +28,18 @@
 ---
 
 ## 📑 Table of Contents
-1. [Key Features](#-key-features)
-2. [UI Walkthrough & Visual Previews](#-ui-walkthrough--visual-previews)
-3. [Market Research & Architecture Pattern](#-market-research--architecture-pattern)
-4. [System Architecture](#-system-architecture)
-5. [LLM Prompt Engineering & Scoring Strategy](#-llm-prompt-engineering--scoring-strategy)
-6. [Database Schema (SQLite)](#-database-schema-sqlite)
-7. [API Reference](#-api-reference)
-8. [Installation & Quick Start](#-installation--quick-start)
-9. [Sample Datasets & Evaluation Flow](#-sample-datasets--evaluation-flow)
-10. [Neo-Brutalist Design System](#-neo-brutalist-design-system)
-11. [License](#-license)
+1. [Live Demo Video](#-live-demo-video)
+2. [Key Features](#-key-features)
+3. [UI Walkthrough & Visual Previews](#-ui-walkthrough--visual-previews)
+4. [Market Research & Architecture Pattern](#-market-research--architecture-pattern)
+5. [System Architecture](#-system-architecture)
+6. [LLM Prompt Engineering & Scoring Strategy](#-llm-prompt-engineering--scoring-strategy)
+7. [Database Schema (SQLite)](#-database-schema-sqlite)
+8. [API Reference](#-api-reference)
+9. [Installation & Quick Start](#-installation--quick-start)
+10. [Sample Datasets & Evaluation Flow](#-sample-datasets--evaluation-flow)
+11. [Neo-Brutalist Design System](#-neo-brutalist-design-system)
+12. [License](#-license)
 
 ---
 

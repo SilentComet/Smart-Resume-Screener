@@ -13,12 +13,14 @@ dist
 dist-ssr
 *.local
 
-# Database
+# Database & Uploads
 *.sqlite
 *.sqlite3
 *.db
 uploads/*
 !uploads/.gitkeep
+server/uploads/*
+!server/uploads/.gitkeep
 
 # Environment variables
 .env
