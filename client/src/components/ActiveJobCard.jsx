@@ -1,12 +1,13 @@
 import React from 'react';
-import { Target, Clock, GraduationCap, Zap, Loader2, GitCompare } from 'lucide-react';
+import { Target, Clock, GraduationCap, Zap, Loader2, GitCompare, Trash2 } from 'lucide-react';
 
 export default function ActiveJobCard({
   job,
   onBatchScreen,
   isScreening,
   selectedForCompare,
-  onOpenCompare
+  onOpenCompare,
+  onDeleteJob
 }) {
   if (!job) return null;
 
@@ -36,6 +37,32 @@ export default function ActiveJobCard({
               <GraduationCap style={{ width: 10, height: 10 }} />
               {job.education_requirement ? job.education_requirement.slice(0, 28) : 'Degree Req.'}
             </span>
+            {onDeleteJob && (
+              <button
+                type="button"
+                onClick={() => onDeleteJob(job)}
+                style={{
+                  background: '#fafaf5',
+                  border: '2px solid #0a0a0a',
+                  color: '#FF0099',
+                  boxShadow: '2px 2px 0 #0a0a0a',
+                  fontFamily: 'IBM Plex Mono, monospace',
+                  fontWeight: 800,
+                  fontSize: 10,
+                  textTransform: 'uppercase',
+                  padding: '3px 8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  marginLeft: 'auto'
+                }}
+                title="Delete this Job Profile"
+              >
+                <Trash2 style={{ width: 11, height: 11 }} />
+                Delete Profile
+              </button>
+            )}
           </div>
 
           <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 28, color: '#0a0a0a', margin: '0 0 8px', lineHeight: 1.1 }}>

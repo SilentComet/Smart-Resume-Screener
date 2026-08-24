@@ -137,6 +137,7 @@ router.put('/:id', async (req, res) => {
 // Delete job
 router.delete('/:id', async (req, res) => {
   try {
+    await query.run('DELETE FROM screenings WHERE job_id = ?', [req.params.id]);
     await query.run('DELETE FROM jobs WHERE id = ?', [req.params.id]);
     res.json({ message: 'Job deleted successfully' });
   } catch (error) {

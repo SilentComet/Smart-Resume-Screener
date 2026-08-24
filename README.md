@@ -1,4 +1,4 @@
-# Smart Resume Screener (TalentPulse AI)
+# Smart Resume Screener
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-indigo.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-v20%2B-green.svg)](https://nodejs.org/)

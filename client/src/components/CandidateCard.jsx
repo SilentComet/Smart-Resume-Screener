@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, CheckCircle2, XCircle, ChevronRight, Zap, ArrowUpRight } from 'lucide-react';
+import { MapPin, CheckCircle2, XCircle, ChevronRight, Zap, ArrowUpRight, Trash2 } from 'lucide-react';
 
 // Shared markdown stripper — removes **bold**, *italic*, __bold__, _italic_, # headings, `code`
 const stripMd = (text) =>
@@ -36,7 +36,8 @@ export default function CandidateCard({
   isSelectedForCompare,
   onToggleCompare,
   onScreenSingle,
-  isScreening
+  isScreening,
+  onDeleteCandidate
 }) {
   const {
     candidate_name,
@@ -217,12 +218,39 @@ export default function CandidateCard({
         <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: '#0a0a0a', opacity: 0.45 }}>
           {skillsCount} skills indexed
         </span>
-        <button
-          onClick={() => onSelect(candidate)}
-          style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, fontSize: 11, color: '#0066FF', background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}
-        >
-          Full Breakdown <ChevronRight style={{ width: 13, height: 13 }} />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {onDeleteCandidate && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteCandidate(candidate);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#FF0099',
+                cursor: 'pointer',
+                padding: '2px 4px',
+                display: 'flex',
+                alignItems: 'center',
+                opacity: 0.6,
+                transition: 'opacity 0.1s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+              title="Delete Candidate Profile"
+            >
+              <Trash2 style={{ width: 13, height: 13 }} />
+            </button>
+          )}
+          <button
+            onClick={() => onSelect(candidate)}
+            style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, fontSize: 11, color: '#0066FF', background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}
+          >
+            Full Breakdown <ChevronRight style={{ width: 13, height: 13 }} />
+          </button>
+        </div>
       </div>
     </div>
   );

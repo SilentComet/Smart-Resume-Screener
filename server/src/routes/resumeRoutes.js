@@ -192,6 +192,7 @@ router.get('/:id', async (req, res) => {
 // Delete candidate
 router.delete('/:id', async (req, res) => {
   try {
+    await query.run('DELETE FROM screenings WHERE candidate_id = ?', [req.params.id]);
     await query.run('DELETE FROM candidates WHERE id = ?', [req.params.id]);
     res.json({ message: 'Candidate deleted successfully' });
   } catch (error) {

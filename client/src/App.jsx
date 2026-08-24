@@ -16,7 +16,7 @@ import SettingsModal from './components/SettingsModal.jsx';
 import {
   fetchJobs, fetchCandidates, fetchScreeningsForJob,
   batchScreenCandidates, screenSingleCandidate, updateCandidateStatus,
-  fetchStats, fetchSettings
+  fetchStats, fetchSettings, deleteJob, deleteCandidate
 } from './api/client.js';
 
 export default function App() {
@@ -122,6 +122,54 @@ export default function App() {
     }
   };
 
+  const handleDeleteJob = async (job) => {
+    const jobId = job.id || job;
+    const jobTitle = job.title || 'this job';
+    if (!window.confirm(`Delete job position "${jobTitle}" and all its screening evaluations?`)) return;
+    try {
+      await deleteJob(jobId);
+      showToast(`🗑️ Job "${jobTitle}" deleted.`);
+      const updatedJobs = await fetchJobs();
+      setJobs(updatedJobs);
+      if (updatedJobs.length > 0) {
+        setSelectedJob(updatedJobs[0]);
+        await loadJobData(updatedJobs[0].id);
+      } else {
+        setSelectedJob(null);
+        setScreenings([]);
+        setStats({});
+      }
+    } catch (err) {
+      showToast(`❌ Failed to delete job: ${err.message}`);
+    }
+  };
+
+  const handleDeleteCandidate = async (candidate) => {
+    const candId = typeof candidate === 'object' ? (candidate.candidate_id || candidate.id) : candidate;
+    const candName = typeof candidate === 'object' ? (candidate.candidate_name || candidate.name || 'Candidate') : 'Candidate';
+    if (!window.confirm(`Permanently delete resume profile for "${candName}"?`)) return;
+    try {
+      await deleteCandidate(candId);
+      showToast(`🗑️ Candidate profile for "${candName}" deleted.`);
+      if (selectedCandidate && (selectedCandidate.id === candId || selectedCandidate.candidate_id === candId)) {
+        setSelectedCandidate(null);
+      }
+      setSelectedForCompare(prev => prev.filter(c => (c.id || c.candidate_id) !== candId));
+      const [candsData, statsData] = await Promise.all([
+        fetchCandidates(),
+        selectedJob ? fetchStats(selectedJob.id) : null
+      ]);
+      setCandidates(candsData);
+      if (selectedJob) {
+        const scrData = await fetchScreeningsForJob(selectedJob.id);
+        setScreenings(scrData);
+      }
+      if (statsData) setStats(statsData);
+    } catch (err) {
+      showToast(`❌ Failed to delete candidate: ${err.message}`);
+    }
+  };
+
   const combinedCandidates = candidates.map(cand => {
     const screening = screenings.find(s => s.candidate_id === cand.id);
     if (screening) {
@@ -173,7 +221,7 @@ export default function App() {
       <Navbar
         jobs={jobs} selectedJob={selectedJob} onSelectJob={handleSelectJob}
         onOpenUpload={() => setIsUploadOpen(true)} onOpenNewJob={() => setIsJobModalOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)} onDeleteJob={handleDeleteJob}
         candidateCount={candidates.length} activeProvider={activeProvider}
       />
 
@@ -188,7 +236,7 @@ export default function App() {
         )}
 
         <StatBento stats={stats} selectedJob={selectedJob} />
-        <ActiveJobCard job={selectedJob} onBatchScreen={handleBatchScreen} isScreening={isScreening} selectedForCompare={selectedForCompare} onOpenCompare={() => setIsCompareOpen(true)} />
+        <ActiveJobCard job={selectedJob} onBatchScreen={handleBatchScreen} isScreening={isScreening} selectedForCompare={selectedForCompare} onOpenCompare={() => setIsCompareOpen(true)} onDeleteJob={handleDeleteJob} />
 
         {/* Search, Filter & View Controls */}
         <div className="nb-card-static" style={{ padding: 16, marginBottom: 20 }}>
@@ -303,6 +351,7 @@ export default function App() {
                   onToggleCompare={handleToggleCompare}
                   onScreenSingle={handleScreenSingle}
                   isScreening={isScreening}
+                  onDeleteCandidate={handleDeleteCandidate}
                 />
               ))}
             </div>
@@ -316,6 +365,7 @@ export default function App() {
               sortField={sortField}
               sortOrder={sortOrder}
               onSort={handleSort}
+              onDeleteCandidate={handleDeleteCandidate}
             />
           )
         ) : (
@@ -343,7 +393,7 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 8, height: 8, background: '#00CC44', border: '1.5px solid #00CC44', display: 'inline-block' }} />
             <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#fafaf5', opacity: 0.7 }}>
-              TalentPulse AI Smart Screener · Privacy Preserved · Local SQLite DB
+              Smart Resume Screener · Privacy Preserved · Local SQLite DB
             </span>
           </div>
           <div style={{ display: 'flex', gap: 16 }}>
@@ -355,7 +405,7 @@ export default function App() {
 
       {/* Modals */}
       {selectedCandidate && (
-        <CandidateDetailModal candidate={selectedCandidate} selectedJob={selectedJob} onClose={() => setSelectedCandidate(null)} onStatusChange={handleStatusChange} onReScreen={handleScreenSingle} isScreening={isScreening} />
+        <CandidateDetailModal candidate={selectedCandidate} selectedJob={selectedJob} onClose={() => setSelectedCandidate(null)} onStatusChange={handleStatusChange} onReScreen={handleScreenSingle} isScreening={isScreening} onDeleteCandidate={handleDeleteCandidate} />
       )}
       {isCompareOpen && (
         <CandidateComparisonModal candidates={selectedForCompare} selectedJob={selectedJob} onClose={() => setIsCompareOpen(false)} onStatusChange={handleStatusChange} onSelectCandidate={c => { setIsCompareOpen(false); setSelectedCandidate(c); }} />

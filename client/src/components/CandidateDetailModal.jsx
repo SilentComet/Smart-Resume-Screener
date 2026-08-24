@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Zap, CheckCircle2, XCircle, Briefcase, GraduationCap, HelpCircle, FileText, Code2, MapPin, Mail, ThumbsUp, AlertTriangle, Loader2 } from 'lucide-react';
+import { X, Zap, CheckCircle2, XCircle, Briefcase, GraduationCap, HelpCircle, FileText, Code2, MapPin, Mail, ThumbsUp, AlertTriangle, Loader2, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 function getScoreStyle(score) {
@@ -37,7 +37,8 @@ export default function CandidateDetailModal({
   onClose,
   onStatusChange,
   onReScreen,
-  isScreening
+  isScreening,
+  onDeleteCandidate
 }) {
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -157,15 +158,33 @@ export default function CandidateDetailModal({
             ))}
           </div>
 
-          <button
-            className="nb-btn nb-btn-blue"
-            onClick={() => onReScreen(candidate)}
-            disabled={isScreening}
-            style={{ padding: '6px 14px', fontSize: 12 }}
-          >
-            {isScreening ? <Loader2 style={{ width: 14, height: 14, animation: 'nb-spin 0.8s linear infinite' }} /> : <Zap style={{ width: 14, height: 14 }} />}
-            Re-Evaluate LLM
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {onDeleteCandidate && (
+              <button
+                type="button"
+                className="nb-btn nb-btn-white"
+                onClick={() => {
+                  onDeleteCandidate(candidate);
+                  onClose();
+                }}
+                style={{ padding: '6px 12px', fontSize: 12, color: '#FF0099' }}
+                title="Delete Candidate Profile"
+              >
+                <Trash2 style={{ width: 14, height: 14 }} />
+                Delete Profile
+              </button>
+            )}
+
+            <button
+              className="nb-btn nb-btn-blue"
+              onClick={() => onReScreen(candidate)}
+              disabled={isScreening}
+              style={{ padding: '6px 14px', fontSize: 12 }}
+            >
+              {isScreening ? <Loader2 style={{ width: 14, height: 14, animation: 'nb-spin 0.8s linear infinite' }} /> : <Zap style={{ width: 14, height: 14 }} />}
+              Re-Evaluate LLM
+            </button>
+          </div>
         </div>
 
         {/* ── Tabs ── */}
@@ -239,7 +258,7 @@ export default function CandidateDetailModal({
                   <div style={{ width: 32, height: 32, background: '#FFE500', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Zap style={{ width: 16, height: 16 }} />
                   </div>
-                  <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0 }}>AI Recruiter Reasoning</h4>
+                  <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.04em', margin: 0, color: '#0a0a0a' }}>AI Recruiter Reasoning</h4>
                 </div>
                 <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 14, lineHeight: 1.7, color: '#0a0a0a', margin: 0 }}>
                   {stripMd(justification) || 'No justification provided.'}
@@ -297,37 +316,37 @@ export default function CandidateDetailModal({
           {activeTab === 'experience' && (
             <>
               <div>
-                <h4 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, borderBottom: '2px solid #0a0a0a', paddingBottom: 8 }}>
+                <h4 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, borderBottom: '2px solid #0a0a0a', paddingBottom: 8, color: '#0a0a0a' }}>
                   <Briefcase style={{ width: 14, height: 14 }} /> Work History
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {candidate_experience.length > 0 ? candidate_experience.map((exp, i) => (
                     <div key={i} className="nb-card-static" style={{ padding: 16 }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                        <h5 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 15, margin: 0 }}>{exp.title}</h5>
+                        <h5 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 15, margin: 0, color: '#0a0a0a' }}>{exp.title}</h5>
                         <span className="nb-badge nb-badge-black" style={{ fontSize: 10, flexShrink: 0 }}>{exp.duration}</span>
                       </div>
                       {exp.company && <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#0a0a0a', opacity: 0.6, margin: '4px 0' }}>{exp.company}</p>}
                       {exp.description && <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: 13, lineHeight: 1.6, margin: '8px 0 0', color: '#0a0a0a', opacity: 0.8, whiteSpace: 'pre-line' }}>{exp.description}</p>}
                     </div>
-                  )) : <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, opacity: 0.5, fontStyle: 'italic' }}>No structured work entries detected.</p>}
+                  )) : <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, opacity: 0.5, fontStyle: 'italic', color: '#0a0a0a' }}>No structured work entries detected.</p>}
                 </div>
               </div>
 
               <div>
-                <h4 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, borderBottom: '2px solid #0a0a0a', paddingBottom: 8 }}>
+                <h4 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, borderBottom: '2px solid #0a0a0a', paddingBottom: 8, color: '#0a0a0a' }}>
                   <GraduationCap style={{ width: 14, height: 14 }} /> Education
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {candidate_education.length > 0 ? candidate_education.map((edu, i) => (
                     <div key={i} className="nb-card-static" style={{ padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div>
-                        <h5 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 14, margin: 0 }}>{edu.degree} in {edu.field}</h5>
+                        <h5 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 800, fontSize: 14, margin: 0, color: '#0a0a0a' }}>{edu.degree} in {edu.field}</h5>
                         <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#0a0a0a', opacity: 0.6, margin: '4px 0 0' }}>{edu.institution}</p>
                       </div>
                       <span className="nb-badge nb-badge-blue" style={{ fontSize: 11 }}>{edu.year}</span>
                     </div>
-                  )) : <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, opacity: 0.5, fontStyle: 'italic' }}>No structured education entries found.</p>}
+                  )) : <p style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, opacity: 0.5, fontStyle: 'italic', color: '#0a0a0a' }}>No structured education entries found.</p>}
                 </div>
               </div>
             </>
@@ -341,7 +360,7 @@ export default function CandidateDetailModal({
                   if (!skills || skills.length === 0) return null;
                   return (
                     <div key={category} className="nb-card-static" style={{ padding: 16 }}>
-                      <h5 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <h5 style={{ fontFamily: 'IBM Plex Mono, monospace', fontWeight: 800, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, color: '#0a0a0a' }}>
                         <span style={{ background: '#FFE500', border: '2px solid #0a0a0a', padding: '1px 8px', fontSize: 10 }}>{skills.length}</span>
                         {category}
                       </h5>

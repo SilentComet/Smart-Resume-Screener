@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpDown, ChevronRight } from 'lucide-react';
+import { ArrowUpDown, ChevronRight, Trash2 } from 'lucide-react';
 
 function getScoreStyle(score) {
   if (score >= 8.5) return { background: '#00CC44', color: '#0a0a0a' };
@@ -46,7 +46,8 @@ export default function CandidateTable({
   onToggleCompare,
   sortField,
   sortOrder,
-  onSort
+  onSort,
+  onDeleteCandidate
 }) {
   return (
     <div className="nb-card-static" style={{ overflow: 'hidden' }}>
@@ -166,12 +167,39 @@ export default function CandidateTable({
 
                   {/* Action */}
                   <td style={{ ...TD_STYLE, textAlign: 'right' }}>
-                    <button
-                      onClick={() => onSelect(c)}
-                      style={{ background: '#0a0a0a', border: '2px solid #0a0a0a', color: '#FFE500', padding: '5px 8px', cursor: 'pointer', boxShadow: '2px 2px 0 #FFE500', transition: 'all 0.1s' }}
-                    >
-                      <ChevronRight style={{ width: 14, height: 14 }} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
+                      {onDeleteCandidate && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteCandidate(c);
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#FF0099',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            opacity: 0.6,
+                            transition: 'opacity 0.1s'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                          onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+                          title="Delete Candidate Profile"
+                        >
+                          <Trash2 style={{ width: 14, height: 14 }} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => onSelect(c)}
+                        style={{ background: '#0a0a0a', border: '2px solid #0a0a0a', color: '#FFE500', padding: '5px 8px', cursor: 'pointer', boxShadow: '2px 2px 0 #FFE500', transition: 'all 0.1s' }}
+                      >
+                        <ChevronRight style={{ width: 14, height: 14 }} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

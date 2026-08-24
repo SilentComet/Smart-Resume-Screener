@@ -116,3 +116,11 @@ export async function testLLMConnection(provider, apiKey) {
   });
   return res.json();
 }
+
+export async function deleteJob(jobId) {
+  const res = await fetch(`${BASE_URL}/jobs/${jobId}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) throw new Error('Failed to delete job profile');
+  return res.json();
+}
